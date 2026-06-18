@@ -104,6 +104,17 @@ tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:#f9f7ff;}
 tbody tr.selected td{background:#ede9fe!important;}
 
+/* FROZEN FIRST COL — all tables */
+tbody td:first-child, thead th:first-child {
+  position:sticky;left:0;z-index:4;
+  background:#ffffff;
+}
+thead th:first-child{z-index:12;background:var(--lavender);}
+tbody tr:hover td:first-child{background:#f9f7ff;}
+tbody tr.selected td:first-child{background:#ede9fe!important;}
+/* month header spans full width — no sticky needed */
+.month-hdr td{position:static!important;background:var(--plum)!important;}
+
 /* FROZEN FIRST COL — readiness */
 .rtbl th:first-child,.rtbl td:first-child{position:sticky;left:0;z-index:5;background:#f9f7ff;border-right:2px solid var(--border);min-width:195px;font-weight:700;color:var(--plum);}
 .rtbl thead th:first-child{z-index:15;background:var(--lavender);}
@@ -574,15 +585,21 @@ function buildTbl(headId, bodyId, cols, data, rowFn) {
   // HEADER
   const htr=document.getElementById(headId);
   htr.innerHTML='';
+  const tableId=htr.closest('table')?.id||headId;
   cols.forEach((c,ci)=>{
     const th=document.createElement('th');
-    th.style.minWidth=(c.w||110)+'px';
+    // Use saved width if available, else default
+    const savedW=(savedColWidths[tableId]&&savedColWidths[tableId][ci])||((c.w||110)+'px');
+    th.style.minWidth=savedW;
+    th.style.width=savedW;
     th.innerHTML=`${c.label}<i class="sort-icon"></i><span class="cr" onmousedown="startResize(event,this)"> </span>`;
     th.onclick=function(e){ if(e.target.classList.contains('cr')) return; doHeaderClick(ci,headId,bodyId,cols,data,rowFn); };
     htr.appendChild(th);
   });
   // BODY
   rebuildBody(bodyId, cols, data, rowFn);
+  // Reapply wrap state after render
+  setTimeout(applyWrap, 0);
 }
 
 function rebuildBody(bodyId, cols, data, rowFn) {
@@ -654,10 +671,27 @@ let rsz=null;
 function startResize(e,el) {
   e.stopPropagation(); e.preventDefault();
   const th=el.closest('th');
-  rsz={th,sx:e.clientX,sw:th.offsetWidth,el};
+  const tbl=th.closest('table');
+  const tableId=tbl.id||'';
+  const ci=Array.from(th.parentElement.children).indexOf(th);
+  rsz={th,sx:e.clientX,sw:th.offsetWidth,el,tableId,ci};
   el.classList.add('active');
-  document.onmousemove=function(e){ if(!rsz)return; rsz.th.style.minWidth=Math.max(50,rsz.sw+e.clientX-rsz.sx)+'px'; };
-  document.onmouseup=function(){ if(rsz){rsz.el.classList.remove('active');rsz=null;} document.onmousemove=null; document.onmouseup=null; };
+  document.onmousemove=function(e){
+    if(!rsz)return;
+    const w=Math.max(50,rsz.sw+e.clientX-rsz.sx)+'px';
+    rsz.th.style.minWidth=w;
+    rsz.th.style.width=w;
+  };
+  document.onmouseup=function(){
+    if(rsz){
+      const w=rsz.th.style.width;
+      saveColWidth(rsz.tableId, rsz.ci, w);
+      rsz.el.classList.remove('active');
+      rsz=null;
+    }
+    document.onmousemove=null;
+    document.onmouseup=null;
+  };
 }
 
 // ============================================================
@@ -1097,6 +1131,7 @@ function rebuildMasterBody() {
   });
 
   if(srchTerm) setTimeout(()=>hlSearch(srchTerm),30);
+  setTimeout(applyWrap, 0);
 }
 
 function updateStats() {
@@ -1321,9 +1356,46 @@ function clearAF() { afFilters={}; afOn=false; document.getElementById('afBtn').
 function toggleWrap() {
   wrapOn=!wrapOn;
   document.getElementById('wrapBtn').classList.toggle('on',wrapOn);
-  document.querySelectorAll('.c-ta').forEach(el=>{ el.style.whiteSpace=wrapOn?'pre-wrap':'nowrap'; el.style.overflow=wrapOn?'visible':'hidden'; if(wrapOn)autoH(el); });
+  applyWrap();
 }
-function fitCols() { document.querySelectorAll('thead th').forEach(th=>{th.style.minWidth='60px';th.style.width='auto';}); }
+
+function applyWrap() {
+  document.querySelectorAll('.c-ta').forEach(el=>{
+    el.style.whiteSpace=wrapOn?'pre-wrap':'nowrap';
+    el.style.overflow=wrapOn?'visible':'hidden';
+    if(wrapOn) autoH(el);
+  });
+}
+
+// Store column widths by table+colIndex so they survive re-renders
+const savedColWidths={};
+
+function fitCols() {
+  document.querySelectorAll('thead th').forEach(th=>{
+    th.style.minWidth='60px';
+    th.style.width='auto';
+  });
+  // Clear saved widths so fit takes effect
+  Object.keys(savedColWidths).forEach(k=>delete savedColWidths[k]);
+}
+
+// Save width when user resizes a column
+function saveColWidth(tableId, ci, width) {
+  if(!savedColWidths[tableId]) savedColWidths[tableId]={};
+  savedColWidths[tableId][ci]=width;
+}
+
+// Restore saved widths after a table re-renders
+function restoreColWidths(headId, tableId) {
+  if(!savedColWidths[tableId]) return;
+  const ths=document.getElementById(headId).querySelectorAll('th');
+  ths.forEach((th,ci)=>{
+    if(savedColWidths[tableId][ci]) {
+      th.style.minWidth=savedColWidths[tableId][ci];
+      th.style.width=savedColWidths[tableId][ci];
+    }
+  });
+}
 
 function insRowAbove() {
   if(!unlocked||!selRow) return alert('Select a row first.');
