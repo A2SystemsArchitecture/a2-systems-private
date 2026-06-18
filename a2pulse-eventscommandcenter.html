@@ -686,6 +686,7 @@ function startResize(e,el) {
     if(rsz){
       const w=rsz.th.style.width;
       saveColWidth(rsz.tableId, rsz.ci, w);
+      if(window._fbSave) window._fbSave();
       rsz.el.classList.remove('active');
       rsz=null;
     }
@@ -1357,6 +1358,7 @@ function toggleWrap() {
   wrapOn=!wrapOn;
   document.getElementById('wrapBtn').classList.toggle('on',wrapOn);
   applyWrap();
+  if(window._fbSave) window._fbSave();
 }
 
 function applyWrap() {
@@ -1375,8 +1377,8 @@ function fitCols() {
     th.style.minWidth='60px';
     th.style.width='auto';
   });
-  // Clear saved widths so fit takes effect
   Object.keys(savedColWidths).forEach(k=>delete savedColWidths[k]);
+  if(window._fbSave) window._fbSave();
 }
 
 // Save width when user resizes a column
@@ -1489,7 +1491,9 @@ window._fbSave = function() {
       const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
       await setDoc(doc(window.__db, "gulliver-events", "data"), {
         events: EVENTS, deadlines: DL, vendors: VN, sponsors: SP,
-        readiness: RD, checklist: CLS, lastUpdated: new Date().toISOString()
+        readiness: RD, checklist: CLS,
+        prefs: { wrapOn: wrapOn, colWidths: savedColWidths },
+        lastUpdated: new Date().toISOString()
       });
       document.getElementById('saveInd').textContent = 'Saved to cloud ✓';
     } catch(err) {
@@ -1532,6 +1536,14 @@ const _fbPoll = setInterval(()=>{
           if(d.sponsors && d.sponsors.length){ SP.length=0; d.sponsors.forEach(e=>SP.push(e)); }
           if(d.readiness) Object.assign(RD, d.readiness);
           if(d.checklist) Object.assign(CLS, d.checklist);
+          // Restore view preferences
+          if(d.prefs) {
+            if(d.prefs.wrapOn !== undefined) {
+              wrapOn = d.prefs.wrapOn;
+              document.getElementById('wrapBtn').classList.toggle('on', wrapOn);
+            }
+            if(d.prefs.colWidths) Object.assign(savedColWidths, d.prefs.colWidths);
+          }
           document.getElementById('saveInd').textContent = 'Live';
           // Re-save to fix any type field corruption from previous saves
           if(window._fbSave) window._fbSave();
