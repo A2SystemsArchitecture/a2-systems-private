@@ -589,7 +589,7 @@ function buildTbl(headId, bodyId, cols, data, rowFn) {
   cols.forEach((c,ci)=>{
     const th=document.createElement('th');
     // Use saved width if available, else default
-    const savedW=(savedColWidths[tableId]&&savedColWidths[tableId][ci])||((c.w||110)+'px');
+    const savedW=(savedColWidths[tableId]&&savedColWidths[tableId][String(ci)])||((c.w||110)+'px');
     th.style.minWidth=savedW;
     th.style.width=savedW;
     th.innerHTML=`${c.label}<i class="sort-icon"></i><span class="cr" onmousedown="startResize(event,this)"> </span>`;
@@ -994,31 +994,29 @@ function mRow(row, idx) {
 }
 
 function renderMaster() {
-  // Build header once
   const htr=document.getElementById('masterHead');
   htr.innerHTML='';
+  const masterTableId='masterTbl';
   M_COLS.forEach((c,ci)=>{
     const th=document.createElement('th');
-    th.style.minWidth=(c.w||110)+'px';
+    const savedW=(savedColWidths[masterTableId]&&savedColWidths[masterTableId][String(ci)])||((c.w||110)+'px');
+    th.style.minWidth=savedW;
+    th.style.width=savedW;
     th.dataset.ci=ci;
     th.innerHTML=`${c.label}<i class="sort-icon"></i><span class="cr" onmousedown="startResize(event,this)"> </span>`;
-    // Header click sets the column for the GLOBAL sort indicator only; actual sort is per-month
     th.onclick=function(e){
       if(e.target.classList.contains('cr')) return;
-      // toggle global sort col/dir used by per-month buttons
       if(sortCol===ci) sortDir=sortDir==='asc'?'desc':'asc';
       else { sortCol=ci; sortDir='asc'; }
       htr.querySelectorAll('th').forEach((t,i)=>{
         t.classList.remove('sort-asc','sort-desc');
         if(i===ci) t.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');
       });
-      // Apply that sort to every month group
       MONTH_ORDER.forEach(mk=>{ monthSortState[mk]={col:ci,dir:sortDir}; });
       rebuildMasterBody();
     };
     htr.appendChild(th);
   });
-
   rebuildMasterBody();
   document.getElementById('masterBadge').textContent=
     (mFilter==="All"?EVENTS:EVENTS.filter(e=>e.type===mFilter)).length+' EVENTS';
@@ -1384,18 +1382,15 @@ function fitCols() {
 // Save width when user resizes a column
 function saveColWidth(tableId, ci, width) {
   if(!savedColWidths[tableId]) savedColWidths[tableId]={};
-  savedColWidths[tableId][ci]=width;
+  savedColWidths[tableId][String(ci)]=width;
 }
 
-// Restore saved widths after a table re-renders
 function restoreColWidths(headId, tableId) {
   if(!savedColWidths[tableId]) return;
   const ths=document.getElementById(headId).querySelectorAll('th');
   ths.forEach((th,ci)=>{
-    if(savedColWidths[tableId][ci]) {
-      th.style.minWidth=savedColWidths[tableId][ci];
-      th.style.width=savedColWidths[tableId][ci];
-    }
+    const w=savedColWidths[tableId][String(ci)];
+    if(w) { th.style.minWidth=w; th.style.width=w; }
   });
 }
 
@@ -1492,7 +1487,7 @@ window._fbSave = function() {
       await setDoc(doc(window.__db, "gulliver-events", "data"), {
         events: EVENTS, deadlines: DL, vendors: VN, sponsors: SP,
         readiness: RD, checklist: CLS,
-        prefs: { wrapOn: wrapOn, colWidths: savedColWidths },
+        prefs: { wrapOn: wrapOn, colWidths: JSON.stringify(savedColWidths) },
         lastUpdated: new Date().toISOString()
       });
       document.getElementById('saveInd').textContent = 'Saved to cloud ✓';
@@ -1542,7 +1537,12 @@ const _fbPoll = setInterval(()=>{
               wrapOn = d.prefs.wrapOn;
               document.getElementById('wrapBtn').classList.toggle('on', wrapOn);
             }
-            if(d.prefs.colWidths) Object.assign(savedColWidths, d.prefs.colWidths);
+            if(d.prefs.colWidths) {
+              try {
+                const cw = typeof d.prefs.colWidths === 'string' ? JSON.parse(d.prefs.colWidths) : d.prefs.colWidths;
+                Object.assign(savedColWidths, cw);
+              } catch(e) { console.warn('Could not restore col widths', e); }
+            }
           }
           document.getElementById('saveInd').textContent = 'Live';
           // Re-save to fix any type field corruption from previous saves
