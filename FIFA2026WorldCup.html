@@ -79,6 +79,12 @@
   .champ-label { font-size:11px; font-weight:800; letter-spacing:3px; color:var(--gold); text-transform:uppercase; }
   .champ-name { font-size:17px; font-weight:900; color:#fff; letter-spacing:2px; text-transform:uppercase; }
   .champ-tbd { font-size:11px; color:var(--muted); letter-spacing:1px; }
+
+  .controls { display:flex; align-items:center; justify-content:center; gap:12px; padding:10px 20px 0; flex-wrap:wrap; }
+  .save-btn { background:var(--gold); color:#000; border:none; padding:7px 18px; border-radius:20px; font-size:11px; font-weight:800; cursor:pointer; letter-spacing:1px; text-transform:uppercase; transition:background .2s; }
+  .save-btn:hover { background:var(--gold-light); }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e2035; border:1px solid var(--gold); color:var(--text); padding:10px 20px; border-radius:24px; font-size:12px; font-weight:600; box-shadow:0 4px 20px rgba(0,0,0,.5); transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s; opacity:0; z-index:999; white-space:nowrap; }
+  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 </style>
 </head>
 <body>
@@ -90,7 +96,9 @@
 
 <div class="controls">
   <span class="progress">Matches decided: <b id="prog">0 / 31</b></span>
+  <button class="save-btn" onclick="saveBracket()" title="Copy a shareable link with your picks">&#128190; Save &amp; Share</button>
 </div>
+<div id="toast" class="toast">&#10003; Link copied! Paste it to share your bracket.</div>
 
 <div class="bracket-wrap">
   <div class="bracket" id="bracket"></div>
@@ -308,6 +316,64 @@ function render(){
   document.getElementById("prog").textContent=`${countDecided()} / 31`;
 }
 
+
+// ── SAVE / LOAD VIA URL ───────────────────────────────────────────────────────
+function stateToCode(){
+  // Encode only winner country codes + scores for all matches, compact JSON
+  const pools=["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","fin"];
+  const data=pools.map(p=>S[p].map(m=>({
+    w:m.winner?m.winner.c||m.winner.n:null,
+    s1:m.s1||0, s2:m.s2||0
+  })));
+  return btoa(encodeURIComponent(JSON.stringify(data)));
+}
+
+function codeToState(code){
+  try{
+    const data=JSON.parse(decodeURIComponent(atob(code)));
+    const pools=["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","fin"];
+    // Rebuild all winner references by scanning all teams
+    const allTeams={};
+    [...L32,...R32].forEach(m=>{
+      allTeams[m.t1.c]=m.t1; allTeams[m.t1.n]=m.t1;
+      allTeams[m.t2.c]=m.t2; allTeams[m.t2.n]=m.t2;
+    });
+    data.forEach((pool,pi)=>{
+      pool.forEach((entry,mi)=>{
+        const m=S[pools[pi]][mi];
+        m.s1=entry.s1||""; m.s2=entry.s2||"";
+        if(entry.w){
+          // Find team by code or name
+          const team=allTeams[entry.w]||{n:entry.w,c:entry.w};
+          m.winner=team;
+          // Propagate so downstream slots get filled
+          propagate(pools[pi]+"_"+mi, team);
+        }
+      });
+    });
+  }catch(e){ console.warn("Could not load bracket from URL",e); }
+}
+
+function loadFromURL(){
+  const params=new URLSearchParams(window.location.search);
+  const code=params.get("b");
+  if(code) codeToState(code);
+}
+
+function saveBracket(){
+  const code=stateToCode();
+  const url=window.location.origin+window.location.pathname+"?b="+code;
+  navigator.clipboard.writeText(url).then(()=>{
+    const t=document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),3000);
+  }).catch(()=>{
+    // Fallback: prompt with URL
+    prompt("Copy this link to share your bracket:",url);
+  });
+}
+
+loadFromURL();
 render();
 </script>
 </body>
