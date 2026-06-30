@@ -317,9 +317,10 @@ function render(){
 }
 
 
-// ── SAVE / LOAD VIA URL ───────────────────────────────────────────────────────
+// ── SAVE / LOAD ───────────────────────────────────────────────────────────────
+const LS_KEY = "wc2026_bracket";
+
 function stateToCode(){
-  // Encode only winner country codes + scores for all matches, compact JSON
   const pools=["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","fin"];
   const data=pools.map(p=>S[p].map(m=>({
     w:m.winner?m.winner.c||m.winner.n:null,
@@ -332,7 +333,6 @@ function codeToState(code){
   try{
     const data=JSON.parse(decodeURIComponent(atob(code)));
     const pools=["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","fin"];
-    // Rebuild all winner references by scanning all teams
     const allTeams={};
     [...L32,...R32].forEach(m=>{
       allTeams[m.t1.c]=m.t1; allTeams[m.t1.n]=m.t1;
@@ -343,37 +343,60 @@ function codeToState(code){
         const m=S[pools[pi]][mi];
         m.s1=entry.s1||""; m.s2=entry.s2||"";
         if(entry.w){
-          // Find team by code or name
           const team=allTeams[entry.w]||{n:entry.w,c:entry.w};
           m.winner=team;
-          // Propagate so downstream slots get filled
           propagate(pools[pi]+"_"+mi, team);
         }
       });
     });
-  }catch(e){ console.warn("Could not load bracket from URL",e); }
+    return true;
+  }catch(e){ console.warn("Could not load bracket",e); return false; }
 }
 
-function loadFromURL(){
+// Auto-save to localStorage every time a pick is made
+function autoSave(){
+  try{ localStorage.setItem(LS_KEY, stateToCode()); }catch(e){}
+}
+
+// Load priority: URL param → localStorage → blank
+function loadBracket(){
   const params=new URLSearchParams(window.location.search);
-  const code=params.get("b");
-  if(code) codeToState(code);
+  const urlCode=params.get("b");
+  if(urlCode){ codeToState(urlCode); return; }
+  try{
+    const saved=localStorage.getItem(LS_KEY);
+    if(saved) codeToState(saved);
+  }catch(e){}
+}
+
+// Hook autoSave into every pick action
+const _origPick=pickWinner;
+pickWinner=function(key,slot){ _origPick(key,slot); autoSave(); };
+const _origScore=confirmScore;
+confirmScore=function(key){ _origScore(key); autoSave(); };
+
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3000);
 }
 
 function saveBracket(){
+  // Always write to localStorage first
+  autoSave();
+  // Then copy shareable URL to clipboard
   const code=stateToCode();
   const url=window.location.origin+window.location.pathname+"?b="+code;
   navigator.clipboard.writeText(url).then(()=>{
-    const t=document.getElementById("toast");
-    t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"),3000);
+    showToast("✅ Saved! Share link copied to clipboard.");
   }).catch(()=>{
-    // Fallback: prompt with URL
     prompt("Copy this link to share your bracket:",url);
+    showToast("✅ Bracket saved locally.");
   });
 }
 
-loadFromURL();
+loadBracket();
 render();
 </script>
 </body>
