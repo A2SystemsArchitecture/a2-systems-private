@@ -120,10 +120,41 @@ const R32 = [
 ];
 
 function mk(arr){return arr.map(m=>({t1:m.t1,t2:m.t2,winner:null,s1:"",s2:"",date:m.date||"",time:m.time||"",venue:m.venue||""}))}
-function empty(n){return Array(n).fill(null).map(()=>({t1:null,t2:null,winner:null,s1:"",s2:"",date:"",time:"",venue:""}))}
+
+// Pre-defined schedule for rounds beyond R32
+// Left bracket: lr16[0..3], lqf[0..1], lsf[0], fin[0]
+// Right bracket: rr16[0..3], rqf[0..1], rsf[0]
+const SCHED = {
+  // ROUND OF 16 (Jul 4-7)
+  lr16_0:{date:"Sat Jul 5",  time:"5:00 PM ET",  venue:"Lincoln Financial Field · Philadelphia, PA"},
+  lr16_1:{date:"Mon Jul 7",  time:"3:00 PM ET",  venue:"AT&T Stadium · Arlington, TX"},
+  lr16_2:{date:"Mon Jul 7",  time:"8:00 PM ET",  venue:"Lumen Field · Seattle, WA"},
+  lr16_3:{date:"Tue Jul 8",  time:"12:00 PM ET", venue:"Mercedes-Benz Stadium · Atlanta, GA"},
+  rr16_0:{date:"Sat Jul 5",  time:"1:00 PM ET",  venue:"NRG Stadium · Houston, TX"},
+  rr16_1:{date:"Sun Jul 6",  time:"4:00 PM ET",  venue:"MetLife Stadium · East Rutherford, NJ"},
+  rr16_2:{date:"Sun Jul 6",  time:"8:00 PM ET",  venue:"Estadio Azteca · Mexico City, MX"},
+  rr16_3:{date:"Tue Jul 8",  time:"4:00 PM ET",  venue:"BC Place · Vancouver, Canada"},
+  // QUARTERFINALS (Jul 9-11)
+  lqf_0:{date:"Thu Jul 9",   time:"9:00 PM ET",  venue:"Arrowhead Stadium · Kansas City, MO"},
+  lqf_1:{date:"Fri Jul 10",  time:"3:00 PM ET",  venue:"SoFi Stadium · Inglewood, CA"},
+  rqf_0:{date:"Thu Jul 9",   time:"4:00 PM ET",  venue:"Gillette Stadium · Foxborough, MA"},
+  rqf_1:{date:"Sat Jul 11",  time:"5:00 PM ET",  venue:"Hard Rock Stadium · Miami Gardens, FL"},
+  // SEMIFINALS (Jul 14-15)
+  lsf_0:{date:"Mon Jul 14",  time:"3:00 PM ET",  venue:"AT&T Stadium · Arlington, TX"},
+  rsf_0:{date:"Tue Jul 15",  time:"3:00 PM ET",  venue:"Mercedes-Benz Stadium · Atlanta, GA"},
+  // FINAL (Jul 19)
+  fin_0:{date:"Sun Jul 19",  time:"3:00 PM ET",  venue:"MetLife Stadium · East Rutherford, NJ"},
+};
+
+function empty(n,poolKey){
+  return Array(n).fill(null).map((_,i)=>{
+    const s=SCHED[poolKey+"_"+i]||{};
+    return{t1:null,t2:null,winner:null,s1:"",s2:"",date:s.date||"",time:s.time||"",venue:s.venue||""};
+  });
+}
 function flagUrl(c){return`https://flagcdn.com/40x30/${c}.png`;}
 
-let S = {lr32:mk(L32),rr32:mk(R32),lr16:empty(4),rr16:empty(4),lqf:empty(2),rqf:empty(2),lsf:empty(1),rsf:empty(1),fin:empty(1),open:null};
+let S = {lr32:mk(L32),rr32:mk(R32),lr16:empty(4,"lr16"),rr16:empty(4,"rr16"),lqf:empty(2,"lqf"),rqf:empty(2,"rqf"),lsf:empty(1,"lsf"),rsf:empty(1,"rsf"),fin:empty(1,"fin"),open:null};
 
 const FEED={
   "lr32_0":{p:"lr16",i:0,s:1},"lr32_1":{p:"lr16",i:0,s:2},
