@@ -96,9 +96,9 @@
 
 <div class="controls">
   <span class="progress">Matches decided: <b id="prog">0 / 31</b></span>
-  <button class="save-btn" onclick="saveBracket()" title="Copy a shareable link with your picks">&#128190; Save &amp; Share</button>
+  <button class="save-btn" onclick="saveBracket()">💾 Save &amp; Share</button>
 </div>
-<div id="toast" class="toast">&#10003; Link copied! Paste it to share your bracket.</div>
+<div id="toast" class="toast"></div>
 
 <div class="bracket-wrap">
   <div class="bracket" id="bracket"></div>
@@ -317,7 +317,7 @@ function render(){
 }
 
 
-// ── SAVE / LOAD ───────────────────────────────────────────────────────────────
+// ── AUTOSAVE TO LOCALSTORAGE ──────────────────────────────────────────────────
 const LS_KEY = "wc2026_bracket";
 
 function stateToCode(){
@@ -349,27 +349,28 @@ function codeToState(code){
         }
       });
     });
-    return true;
-  }catch(e){ console.warn("Could not load bracket",e); return false; }
+  }catch(e){ console.warn("Could not restore bracket",e); }
 }
 
-// Auto-save to localStorage every time a pick is made
 function autoSave(){
   try{ localStorage.setItem(LS_KEY, stateToCode()); }catch(e){}
 }
 
-// Load priority: URL param → localStorage → blank
-function loadBracket(){
-  const params=new URLSearchParams(window.location.search);
-  const urlCode=params.get("b");
-  if(urlCode){ codeToState(urlCode); return; }
+function autoLoad(){
+  // URL param takes priority (coming from a shared link)
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const urlCode=params.get("b");
+    if(urlCode){ codeToState(urlCode); return; }
+  }catch(e){}
+  // Otherwise restore from localStorage (same device refresh)
   try{
     const saved=localStorage.getItem(LS_KEY);
     if(saved) codeToState(saved);
   }catch(e){}
 }
 
-// Hook autoSave into every pick action
+// Wrap pick/score actions to autosave after every change
 const _origPick=pickWinner;
 pickWinner=function(key,slot){ _origPick(key,slot); autoSave(); };
 const _origScore=confirmScore;
@@ -379,24 +380,21 @@ function showToast(msg){
   const t=document.getElementById("toast");
   t.textContent=msg;
   t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),3000);
+  setTimeout(()=>t.classList.remove("show"),3500);
 }
 
 function saveBracket(){
-  // Always write to localStorage first
   autoSave();
-  // Then copy shareable URL to clipboard
   const code=stateToCode();
   const url=window.location.origin+window.location.pathname+"?b="+code;
   navigator.clipboard.writeText(url).then(()=>{
-    showToast("✅ Saved! Share link copied to clipboard.");
+    showToast("✅ Bracket saved! Link copied — open it on any device.");
   }).catch(()=>{
-    prompt("Copy this link to share your bracket:",url);
-    showToast("✅ Bracket saved locally.");
+    prompt("Copy & save this link to open your bracket on another device:",url);
   });
 }
 
-loadBracket();
+autoLoad();
 render();
 </script>
 </body>
