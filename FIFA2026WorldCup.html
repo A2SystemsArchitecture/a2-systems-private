@@ -83,8 +83,16 @@
   .controls { display:flex; align-items:center; justify-content:center; gap:12px; padding:10px 20px 0; flex-wrap:wrap; }
   .save-btn { background:var(--gold); color:#000; border:none; padding:7px 18px; border-radius:20px; font-size:11px; font-weight:800; cursor:pointer; letter-spacing:1px; text-transform:uppercase; transition:background .2s; }
   .save-btn:hover { background:var(--gold-light); }
-  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e2035; border:1px solid var(--gold); color:var(--text); padding:10px 20px; border-radius:24px; font-size:12px; font-weight:600; box-shadow:0 4px 20px rgba(0,0,0,.5); transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s; opacity:0; z-index:999; white-space:nowrap; }
-  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  .link-box { display:none; position:fixed; bottom:0; left:0; right:0; background:#0f1018; border-top:2px solid var(--gold); padding:14px 16px; z-index:999; }
+  .link-box.show { display:block; }
+  .link-box-label { font-size:11px; color:var(--gold); font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+  .link-box-row { display:flex; gap:8px; align-items:center; }
+  .link-input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:11px; padding:8px 10px; outline:none; }
+  .link-copy-btn { background:var(--gold); color:#000; border:none; border-radius:6px; padding:8px 14px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap; }
+  .link-copy-btn:hover { background:var(--gold-light); }
+  .link-close-btn { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:8px 12px; font-size:11px; cursor:pointer; }
+  .link-close-btn:hover { border-color:var(--gold); color:var(--gold); }
+  .link-hint { font-size:10px; color:var(--muted); margin-top:7px; }
 </style>
 </head>
 <body>
@@ -98,7 +106,15 @@
   <span class="progress">Matches decided: <b id="prog">0 / 31</b></span>
   <button class="save-btn" onclick="saveBracket()">💾 Save &amp; Share</button>
 </div>
-<div id="toast" class="toast"></div>
+<div id="link-box" class="link-box">
+  <div class="link-box-label">📋 Your bracket link — copy &amp; save it</div>
+  <div class="link-box-row">
+    <input class="link-input" id="link-input" type="text" readonly onclick="this.select()">
+    <button class="link-copy-btn" onclick="copyLink()">Copy</button>
+    <button class="link-close-btn" onclick="closeLinkBox()">✕</button>
+  </div>
+  <div class="link-hint">Open this link on any device to restore your bracket. Bookmark it or save it to your Notes app.</div>
+</div>
 
 <div class="bracket-wrap">
   <div class="bracket" id="bracket"></div>
@@ -376,22 +392,30 @@ pickWinner=function(key,slot){ _origPick(key,slot); autoSave(); };
 const _origScore=confirmScore;
 confirmScore=function(key){ _origScore(key); autoSave(); };
 
-function showToast(msg){
-  const t=document.getElementById("toast");
-  t.textContent=msg;
-  t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),3500);
-}
-
 function saveBracket(){
   autoSave();
   const code=stateToCode();
   const url=window.location.origin+window.location.pathname+"?b="+code;
-  navigator.clipboard.writeText(url).then(()=>{
-    showToast("✅ Bracket saved! Link copied — open it on any device.");
-  }).catch(()=>{
-    prompt("Copy & save this link to open your bracket on another device:",url);
-  });
+  document.getElementById("link-input").value=url;
+  document.getElementById("link-box").classList.add("show");
+  setTimeout(()=>{ document.getElementById("link-input").select(); },100);
+}
+
+function copyLink(){
+  const input=document.getElementById("link-input");
+  input.select();
+  input.setSelectionRange(0,99999);
+  try{
+    navigator.clipboard.writeText(input.value).catch(()=>{});
+    document.execCommand("copy");
+  }catch(e){ document.execCommand("copy"); }
+  const btn=document.querySelector(".link-copy-btn");
+  btn.textContent="Copied ✓";
+  setTimeout(()=>btn.textContent="Copy",2000);
+}
+
+function closeLinkBox(){
+  document.getElementById("link-box").classList.remove("show");
 }
 
 autoLoad();
