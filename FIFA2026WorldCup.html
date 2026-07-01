@@ -146,27 +146,27 @@ const R32 = [
 
 function mk(arr){return arr.map(m=>({t1:m.t1,t2:m.t2,winner:null,s1:"",s2:"",date:m.date||"",time:m.time||"",venue:m.venue||""}))}
 
-// Pre-defined schedule for rounds beyond R32
-// Source: ESPN verified schedule (espn.com) — all times ET
+// Pre-defined schedule — source: Yahoo Sports verified schedule (all times ET)
+// R16 venues are assigned to bracket slots; specific teams determined by R32 results
 const SCHED = {
-  // ROUND OF 16 — Jul 4-7 (July 4 IS a Saturday in 2026)
+  // ROUND OF 16 — Jul 4-7 (Jul 4 = Saturday)
   rr16_0:{date:"Sat Jul 4",  time:"1:00 PM ET",  venue:"NRG Stadium · Houston, TX"},
   lr16_0:{date:"Sat Jul 4",  time:"5:00 PM ET",  venue:"Lincoln Financial Field · Philadelphia, PA"},
   rr16_1:{date:"Sun Jul 5",  time:"4:00 PM ET",  venue:"MetLife Stadium · East Rutherford, NJ"},
   rr16_2:{date:"Sun Jul 5",  time:"8:00 PM ET",  venue:"Estadio Azteca · Mexico City, MX"},
   lr16_1:{date:"Mon Jul 6",  time:"3:00 PM ET",  venue:"AT&T Stadium · Arlington, TX"},
-  lr16_2:{date:"Mon Jul 6",  time:"5:00 PM ET",  venue:"Lumen Field · Seattle, WA"},
+  lr16_2:{date:"Mon Jul 6",  time:"8:00 PM ET",  venue:"Lumen Field · Seattle, WA"},
   lr16_3:{date:"Tue Jul 7",  time:"12:00 PM ET", venue:"Mercedes-Benz Stadium · Atlanta, GA"},
   rr16_3:{date:"Tue Jul 7",  time:"4:00 PM ET",  venue:"BC Place · Vancouver, Canada"},
-  // QUARTERFINALS — Jul 9-11
-  rqf_0:{date:"Thu Jul 9",   time:"4:00 PM ET",  venue:"Gillette Stadium · Foxborough, MA"},
-  lqf_0:{date:"Fri Jul 10",  time:"3:00 PM ET",  venue:"SoFi Stadium · Inglewood, CA"},
-  lqf_1:{date:"Sat Jul 11",  time:"5:00 PM ET",  venue:"Hard Rock Stadium · Miami Gardens, FL"},
-  rqf_1:{date:"Sat Jul 11",  time:"9:00 PM ET",  venue:"Arrowhead Stadium · Kansas City, MO"},
-  // SEMIFINALS — Jul 14-15
-  lsf_0:{date:"Tue Jul 14",  time:"3:00 PM ET",  venue:"AT&T Stadium · Arlington, TX"},
-  rsf_0:{date:"Wed Jul 15",  time:"3:00 PM ET",  venue:"Mercedes-Benz Stadium · Atlanta, GA"},
-  // FINAL — Jul 19
+  // QUARTERFINALS — Jul 9-11 (Wed-Fri)
+  rqf_0:{date:"Wed Jul 9",   time:"4:00 PM ET",  venue:"Gillette Stadium · Foxborough, MA"},
+  lqf_0:{date:"Thu Jul 10",  time:"3:00 PM ET",  venue:"SoFi Stadium · Inglewood, CA"},
+  rqf_1:{date:"Fri Jul 11",  time:"5:00 PM ET",  venue:"Hard Rock Stadium · Miami Gardens, FL"},
+  lqf_1:{date:"Fri Jul 11",  time:"9:00 PM ET",  venue:"Arrowhead Stadium · Kansas City, MO"},
+  // SEMIFINALS — Jul 14-15 (Mon-Tue)
+  lsf_0:{date:"Mon Jul 14",  time:"3:00 PM ET",  venue:"AT&T Stadium · Arlington, TX"},
+  rsf_0:{date:"Tue Jul 15",  time:"3:00 PM ET",  venue:"Mercedes-Benz Stadium · Atlanta, GA"},
+  // FINAL — Jul 19 (Sun)
   fin_0:{date:"Sun Jul 19",  time:"3:00 PM ET",  venue:"MetLife Stadium · East Rutherford, NJ"},
 };
 
