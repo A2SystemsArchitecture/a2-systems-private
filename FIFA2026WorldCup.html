@@ -313,7 +313,10 @@ function matchHTML(key){
   const m=getMatch(key), open=S.open===key;
   const t1w=m.winner&&m.t1&&m.winner.n===m.t1.n;
   const t2w=m.winner&&m.t2&&m.winner.n===m.t2.n;
-  const info=m.date?`<div class="game-info"><div class="gi-top"><span class="gi-date">${m.date}</span><span class="gi-time">· ${m.time}</span></div><div class="gi-venue">${m.venue}</div></div>`:"";
+  const info=m.date?(key==="fin_0"
+    ?`<div class="game-info"><div class="gi-top"><span class="gi-date">Sun Jul 19 · FIFA World Cup Final</span></div><div class="gi-top"><span class="gi-time">3:00 PM ET</span></div><div class="gi-venue">MetLife Stadium · East Rutherford, NJ</div></div>`
+    :`<div class="game-info"><div class="gi-top"><span class="gi-date">${m.date}</span><span class="gi-time">· ${m.time}</span></div><div class="gi-venue">${m.venue}</div></div>`)
+    :"";
   return`<div class="match${open?" open":""}" id="m_${key}">
     ${info}
     ${teamHTML(m.t1,key,1,t1w)}
@@ -350,7 +353,8 @@ function render(){
   const tp=S.tpl[0];
   const tpCard=`<div style="width:100%;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:5px;overflow:hidden;">
     <div class="game-info">
-      <div class="gi-top"><span class="gi-date">Sat Jul 18</span><span class="gi-time">· 5:00 PM ET</span></div>
+      <div class="gi-top"><span class="gi-date">Sat Jul 18 · 3rd Place Match</span></div>
+      <div class="gi-top"><span class="gi-time">5:00 PM ET</span></div>
       <div class="gi-venue">Hard Rock Stadium · Miami Gardens, FL</div>
     </div>
     ${teamHTML(tp.t1,"tpl_0",1,tp.winner&&tp.t1&&tp.winner.n===tp.t1.n)}
