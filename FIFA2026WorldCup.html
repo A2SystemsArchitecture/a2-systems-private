@@ -119,6 +119,7 @@
 <div class="bracket-wrap">
   <div class="bracket" id="bracket"></div>
 </div>
+<div id="third-place-box" style="padding:0 8px 48px;"></div>
 
 <script>
 // c = ISO 3166-1 alpha-2 for flagcdn.com
@@ -146,25 +147,27 @@ const R32 = [
 
 function mk(arr){return arr.map(m=>({t1:m.t1,t2:m.t2,winner:null,s1:"",s2:"",date:m.date||"",time:m.time||"",venue:m.venue||""}))}
 
-// Schedule — source: FIFA/ESPN audited. All times ET (local converted).
+// Schedule — source: ESPN bracket (verified from image). All times ET.
 const SCHED = {
   // ROUND OF 16
-  lr16_0:{date:"Sat Jul 4",  time:"5:00 PM ET",   venue:"Lincoln Financial Field · Philadelphia, PA"},  // M89
-  lr16_1:{date:"Sat Jul 4",  time:"2:00 PM ET",   venue:"NRG Stadium · Houston, TX"},                  // M90
-  lr16_2:{date:"Mon Jul 6",  time:"4:00 PM ET",   venue:"AT&T Stadium · Arlington, TX"},               // M93
-  lr16_3:{date:"Mon Jul 6",  time:"11:00 PM ET",  venue:"Lumen Field · Seattle, WA"},                  // M94
-  rr16_0:{date:"Sun Jul 5",  time:"4:00 PM ET",   venue:"MetLife Stadium · East Rutherford, NJ"},      // M91
-  rr16_1:{date:"Sun Jul 5",  time:"9:00 PM ET",   venue:"Estadio Azteca · Mexico City, MX"},           // M92
-  rr16_2:{date:"Tue Jul 7",  time:"12:00 PM ET",  venue:"Mercedes-Benz Stadium · Atlanta, GA"},        // M95
-  rr16_3:{date:"Tue Jul 7",  time:"7:00 PM ET",   venue:"BC Place · Vancouver, Canada"},               // M96
+  lr16_0:{date:"Sat Jul 4",  time:"5:00 PM ET",   venue:"Lincoln Financial Field · Philadelphia, PA"},  // M89 Paraguay/France
+  lr16_1:{date:"Sat Jul 4",  time:"1:00 PM ET",   venue:"NRG Stadium · Houston, TX"},                  // M90 Canada/Morocco
+  lr16_2:{date:"Mon Jul 6",  time:"3:00 PM ET",   venue:"AT&T Stadium · Arlington, TX"},               // M93 W11/W12
+  lr16_3:{date:"Mon Jul 6",  time:"8:00 PM ET",   venue:"Lumen Field · Seattle, WA"},                  // M94 W9/Belgium
+  rr16_0:{date:"Sun Jul 5",  time:"4:00 PM ET",   venue:"MetLife Stadium · East Rutherford, NJ"},      // M91 Brazil/Norway
+  rr16_1:{date:"Sun Jul 5",  time:"8:00 PM ET",   venue:"Estadio Azteca · Mexico City, MX"},           // M92 Mexico/England
+  rr16_2:{date:"Tue Jul 7",  time:"12:00 PM ET",  venue:"Mercedes-Benz Stadium · Atlanta, GA"},        // M95 W14/W16
+  rr16_3:{date:"Tue Jul 7",  time:"4:00 PM ET",   venue:"BC Place · Vancouver, Canada"},               // M96 W13/W15
   // QUARTERFINALS
   rqf_0:{date:"Thu Jul 9",   time:"4:00 PM ET",   venue:"Gillette Stadium · Foxborough, MA"},          // M97
-  lqf_0:{date:"Fri Jul 10",  time:"6:00 PM ET",   venue:"SoFi Stadium · Inglewood, CA"},              // M98
+  lqf_0:{date:"Fri Jul 10",  time:"3:00 PM ET",   venue:"SoFi Stadium · Inglewood, CA"},              // M98
   rqf_1:{date:"Sat Jul 11",  time:"5:00 PM ET",   venue:"Hard Rock Stadium · Miami Gardens, FL"},      // M99
-  lqf_1:{date:"Sat Jul 11",  time:"10:00 PM ET",  venue:"Arrowhead Stadium · Kansas City, MO"},        // M100
+  lqf_1:{date:"Sat Jul 11",  time:"9:00 PM ET",   venue:"Arrowhead Stadium · Kansas City, MO"},        // M100
   // SEMIFINALS
-  lsf_0:{date:"Tue Jul 14",  time:"4:00 PM ET",   venue:"AT&T Stadium · Arlington, TX"},               // M101
+  lsf_0:{date:"Tue Jul 14",  time:"3:00 PM ET",   venue:"AT&T Stadium · Arlington, TX"},               // M101
   rsf_0:{date:"Wed Jul 15",  time:"3:00 PM ET",   venue:"Mercedes-Benz Stadium · Atlanta, GA"},        // M102
+  // 3RD PLACE
+  tpl_0:{date:"Sat Jul 18",  time:"5:00 PM ET",   venue:"Hard Rock Stadium · Miami Gardens, FL"},      // M103
   // FINAL
   fin_0:{date:"Sun Jul 19",  time:"3:00 PM ET",   venue:"MetLife Stadium · East Rutherford, NJ"},      // M104
 };
@@ -177,7 +180,7 @@ function empty(n,poolKey){
 }
 function flagUrl(c){return`https://flagcdn.com/40x30/${c}.png`;}
 
-let S = {lr32:mk(L32),rr32:mk(R32),lr16:empty(4,"lr16"),rr16:empty(4,"rr16"),lqf:empty(2,"lqf"),rqf:empty(2,"rqf"),lsf:empty(1,"lsf"),rsf:empty(1,"rsf"),fin:empty(1,"fin"),open:null};
+let S = {lr32:mk(L32),rr32:mk(R32),lr16:empty(4,"lr16"),rr16:empty(4,"rr16"),lqf:empty(2,"lqf"),rqf:empty(2,"rqf"),lsf:empty(1,"lsf"),rsf:empty(1,"rsf"),tpl:empty(1,"tpl"),fin:empty(1,"fin"),open:null};
 
 
 
@@ -312,7 +315,7 @@ function champHTML(){
 
 function countDecided(){
   let n=0;
-  ["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","fin"].forEach(p=>S[p].forEach(m=>{if(m.winner)n++;}));
+  ["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","tpl","fin"].forEach(p=>S[p].forEach(m=>{if(m.winner)n++;}));
   return n;
 }
 
@@ -332,7 +335,26 @@ function render(){
     colHTML("rqf","qf","Quarters",2)+
     colHTML("rr16","r16","Round of 16",4)+
     colHTML("rr32","r32","Round of 32",8);
-  document.getElementById("prog").textContent=`${countDecided()} / 31`;
+  document.getElementById("prog").textContent=`${countDecided()} / 32`;
+
+  // 3rd place match box below bracket
+  const tp=S.tpl[0];
+  const tpHTML=`<div style="max-width:340px;margin:18px auto 0;background:#141620;border:1px solid #252840;border-left:2px solid #CA8A04;border-radius:5px;overflow:hidden;">
+    <div style="background:#0d0e18;border-bottom:1px solid #252840;padding:3px 7px;">
+      <div style="font-size:8px;color:#C9A84C;font-weight:700;">Sat Jul 18 · 5:00 PM ET · 3rd Place Match</div>
+      <div style="font-size:8px;color:#6670A0;">Hard Rock Stadium · Miami Gardens, FL</div>
+    </div>
+    ${teamHTML(tp.t1,"tpl_0",1,tp.winner&&tp.t1&&tp.winner.n===tp.t1.n)}
+    ${teamHTML(tp.t2,"tpl_0",2,tp.winner&&tp.t2&&tp.winner.n===tp.t2.n)}
+    <button class="toggle" onclick="toggleOpen('tpl_0')">···</button>
+    ${S.open==="tpl_0"?`<div style="background:#0a0b14;border-top:1px solid #252840;padding:5px 6px;display:flex;align-items:center;justify-content:center;gap:5px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:8px;color:#6670A0;">${tp.t1?tp.t1.n.substring(0,5):"T1"}</div><input class="sc-input" id="sc1_tpl_0" type="number" min="0" max="20" value="${tp.s1}" placeholder="0"></div>
+      <span style="font-size:9px;color:#6670A0;font-weight:700;">VS</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:8px;color:#6670A0;">${tp.t2?tp.t2.n.substring(0,5):"T2"}</div><input class="sc-input" id="sc2_tpl_0" type="number" min="0" max="20" value="${tp.s2}" placeholder="0"></div>
+      <button class="sc-btn" onclick="confirmScore('tpl_0')">Set</button>
+    </div>`:""}
+  </div>`;
+  document.getElementById("third-place-box").innerHTML=tpHTML;
 }
 
 
@@ -340,7 +362,7 @@ function render(){
 const LS_KEY = "wc2026_bracket";
 
 function stateToCode(){
-  const pools=["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","fin"];
+  const pools=["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","tpl","fin"];
   const data=pools.map(p=>S[p].map(m=>({
     w:m.winner?m.winner.c||m.winner.n:null,
     s1:m.s1||0, s2:m.s2||0
@@ -351,7 +373,7 @@ function stateToCode(){
 function codeToState(code){
   try{
     const data=JSON.parse(decodeURIComponent(atob(code)));
-    const pools=["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","fin"];
+    const pools=["lr32","rr32","lr16","rr16","lqf","rqf","lsf","rsf","tpl","fin"];
     const allTeams={};
     [...L32,...R32].forEach(m=>{
       allTeams[m.t1.c]=m.t1; allTeams[m.t1.n]=m.t1;
