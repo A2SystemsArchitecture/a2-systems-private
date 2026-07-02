@@ -121,53 +121,52 @@
 </div>
 
 <script>
-// c = ISO 3166-1 alpha-2 code for flagcdn.com
+// c = ISO 3166-1 alpha-2 for flagcdn.com
 const L32 = [
-  {t1:{n:"Germany",c:"de"},t2:{n:"Paraguay",c:"py"},date:"Mon Jun 29",time:"4:30 PM ET",venue:"Gillette Stadium · Foxborough, MA"},
-    {t1:{n:"France",c:"fr"},t2:{n:"Sweden",c:"se"},date:"Tue Jun 30",time:"5:00 PM ET",venue:"MetLife Stadium · East Rutherford, NJ"},
-    {t1:{n:"South Africa",c:"za"},t2:{n:"Canada",c:"ca"},date:"Sun Jun 28",time:"3:00 PM ET",venue:"SoFi Stadium · Inglewood, CA"},
-    {t1:{n:"Netherlands",c:"nl"},t2:{n:"Morocco",c:"ma"},date:"Mon Jun 29",time:"9:00 PM ET",venue:"Estadio Akron · Zapopan, Mexico"},
-    {t1:{n:"Portugal",c:"pt"},t2:{n:"Croatia",c:"hr"},date:"Thu Jul 2",time:"7:00 PM ET",venue:"BMO Field · Toronto, Canada"},
-    {t1:{n:"Spain",c:"es"},t2:{n:"Austria",c:"at"},date:"Thu Jul 2",time:"3:00 PM ET",venue:"SoFi Stadium · Inglewood, CA"},
-    {t1:{n:"United States",c:"us"},t2:{n:"Bosnia & Herz.",c:"ba"},date:"Wed Jul 1",time:"8:00 PM ET",venue:"Levi's Stadium · Santa Clara, CA"},
-    {t1:{n:"Belgium",c:"be"},t2:{n:"Senegal",c:"sn"},date:"Wed Jul 1",time:"4:00 PM ET",venue:"Lumen Field · Seattle, WA"},
+  {t1:{n:"Germany",c:"de"},       t2:{n:"Paraguay",     c:"py"}, date:"Mon Jun 29", time:"4:30 PM ET",  venue:"Gillette Stadium · Foxborough, MA"},
+  {t1:{n:"France",c:"fr"},        t2:{n:"Sweden",       c:"se"}, date:"Tue Jun 30", time:"5:00 PM ET",  venue:"MetLife Stadium · East Rutherford, NJ"},
+  {t1:{n:"South Africa",c:"za"},  t2:{n:"Canada",       c:"ca"}, date:"Sun Jun 28", time:"6:00 PM ET",  venue:"SoFi Stadium · Inglewood, CA"},
+  {t1:{n:"Netherlands",c:"nl"},   t2:{n:"Morocco",      c:"ma"}, date:"Mon Jun 29", time:"10:00 PM ET", venue:"Estadio BBVA · Monterrey, Mexico"},
+  {t1:{n:"Portugal",c:"pt"},      t2:{n:"Croatia",      c:"hr"}, date:"Thu Jul 2",  time:"7:00 PM ET",  venue:"BMO Field · Toronto, Canada"},
+  {t1:{n:"Spain",c:"es"},         t2:{n:"Austria",      c:"at"}, date:"Thu Jul 2",  time:"6:00 PM ET",  venue:"SoFi Stadium · Inglewood, CA"},
+  {t1:{n:"United States",c:"us"}, t2:{n:"Bosnia & Herz.",c:"ba"},date:"Wed Jul 1",  time:"11:00 PM ET", venue:"Levi's Stadium · Santa Clara, CA"},
+  {t1:{n:"Belgium",c:"be"},       t2:{n:"Senegal",      c:"sn"}, date:"Wed Jul 1",  time:"7:00 PM ET",  venue:"Lumen Field · Seattle, WA"},
 ];
 const R32 = [
-  {t1:{n:"Brazil",c:"br"},t2:{n:"Japan",c:"jp"},date:"Mon Jun 29",time:"1:00 PM ET",venue:"NRG Stadium · Houston, TX"},
-    {t1:{n:"Ivory Coast",c:"ci"},t2:{n:"Norway",c:"no"},date:"Tue Jun 30",time:"1:00 PM ET",venue:"AT&T Stadium · Arlington, TX"},
-    {t1:{n:"Mexico",c:"mx"},t2:{n:"Ecuador",c:"ec"},date:"Tue Jun 30",time:"9:00 PM ET",venue:"Estadio Azteca · Mexico City, MX"},
-    {t1:{n:"England",c:"gb-eng"},t2:{n:"DR Congo",c:"cd"},date:"Wed Jul 1",time:"12:00 PM ET",venue:"Mercedes-Benz Stadium · Atlanta, GA"},
-    {t1:{n:"Argentina",c:"ar"},t2:{n:"Cape Verde",c:"cv"},date:"Fri Jul 3",time:"6:00 PM ET",venue:"Hard Rock Stadium · Miami Gardens, FL"},
-    {t1:{n:"Australia",c:"au"},t2:{n:"Egypt",c:"eg"},date:"Fri Jul 3",time:"2:00 PM ET",venue:"AT&T Stadium · Arlington, TX"},
-    {t1:{n:"Switzerland",c:"ch"},t2:{n:"Algeria",c:"dz"},date:"Thu Jul 2",time:"11:00 PM ET",venue:"BC Place · Vancouver, Canada"},
-    {t1:{n:"Colombia",c:"co"},t2:{n:"Ghana",c:"gh"},date:"Fri Jul 3",time:"9:30 PM ET",venue:"Arrowhead Stadium · Kansas City, MO"},
+  {t1:{n:"Brazil",c:"br"},        t2:{n:"Japan",      c:"jp"}, date:"Mon Jun 29", time:"2:00 PM ET",   venue:"NRG Stadium · Houston, TX"},
+  {t1:{n:"Ivory Coast",c:"ci"},   t2:{n:"Norway",     c:"no"}, date:"Tue Jun 30", time:"2:00 PM ET",   venue:"AT&T Stadium · Arlington, TX"},
+  {t1:{n:"Mexico",c:"mx"},        t2:{n:"Ecuador",    c:"ec"}, date:"Tue Jun 30", time:"10:00 PM ET",  venue:"Estadio Azteca · Mexico City, MX"},
+  {t1:{n:"England",c:"gb-eng"},   t2:{n:"DR Congo",   c:"cd"}, date:"Wed Jul 1",  time:"12:00 PM ET",  venue:"Mercedes-Benz Stadium · Atlanta, GA"},
+  {t1:{n:"Argentina",c:"ar"},     t2:{n:"Cape Verde", c:"cv"}, date:"Fri Jul 3",  time:"6:00 PM ET",   venue:"Hard Rock Stadium · Miami Gardens, FL"},
+  {t1:{n:"Australia",c:"au"},     t2:{n:"Egypt",      c:"eg"}, date:"Fri Jul 3",  time:"3:00 PM ET",   venue:"AT&T Stadium · Arlington, TX"},
+  {t1:{n:"Switzerland",c:"ch"},   t2:{n:"Algeria",    c:"dz"}, date:"Thu Jul 2",  time:"2:00 AM ET",   venue:"BC Place · Vancouver, Canada"},
+  {t1:{n:"Colombia",c:"co"},      t2:{n:"Ghana",      c:"gh"}, date:"Fri Jul 3",  time:"10:30 PM ET",  venue:"Arrowhead Stadium · Kansas City, MO"},
 ];
 
 
 function mk(arr){return arr.map(m=>({t1:m.t1,t2:m.t2,winner:null,s1:"",s2:"",date:m.date||"",time:m.time||"",venue:m.venue||""}))}
 
-// Pre-defined schedule — source: Yahoo Sports verified schedule (all times ET)
-// R16 venues are assigned to bracket slots; specific teams determined by R32 results
+// Schedule — source: FIFA/ESPN audited. All times ET (local converted).
 const SCHED = {
-  // ROUND OF 16 — Jul 4-7 (Jul 4 = Saturday)
-  rr16_0:{date:"Sat Jul 4",  time:"1:00 PM ET",  venue:"NRG Stadium · Houston, TX"},
-  lr16_0:{date:"Sat Jul 4",  time:"5:00 PM ET",  venue:"Lincoln Financial Field · Philadelphia, PA"},
-  rr16_1:{date:"Sun Jul 5",  time:"4:00 PM ET",  venue:"MetLife Stadium · East Rutherford, NJ"},
-  rr16_2:{date:"Sun Jul 5",  time:"8:00 PM ET",  venue:"Estadio Azteca · Mexico City, MX"},
-  lr16_1:{date:"Mon Jul 6",  time:"3:00 PM ET",  venue:"AT&T Stadium · Arlington, TX"},
-  lr16_2:{date:"Mon Jul 6",  time:"8:00 PM ET",  venue:"Lumen Field · Seattle, WA"},
-  lr16_3:{date:"Tue Jul 7",  time:"12:00 PM ET", venue:"Mercedes-Benz Stadium · Atlanta, GA"},
-  rr16_3:{date:"Tue Jul 7",  time:"4:00 PM ET",  venue:"BC Place · Vancouver, Canada"},
-  // QUARTERFINALS — Jul 9-11 (Wed-Fri)
-  rqf_0:{date:"Wed Jul 9",   time:"4:00 PM ET",  venue:"Gillette Stadium · Foxborough, MA"},
-  lqf_0:{date:"Thu Jul 10",  time:"3:00 PM ET",  venue:"SoFi Stadium · Inglewood, CA"},
-  rqf_1:{date:"Fri Jul 11",  time:"5:00 PM ET",  venue:"Hard Rock Stadium · Miami Gardens, FL"},
-  lqf_1:{date:"Fri Jul 11",  time:"9:00 PM ET",  venue:"Arrowhead Stadium · Kansas City, MO"},
-  // SEMIFINALS — Jul 14-15 (Mon-Tue)
-  lsf_0:{date:"Mon Jul 14",  time:"3:00 PM ET",  venue:"AT&T Stadium · Arlington, TX"},
-  rsf_0:{date:"Tue Jul 15",  time:"3:00 PM ET",  venue:"Mercedes-Benz Stadium · Atlanta, GA"},
-  // FINAL — Jul 19 (Sun)
-  fin_0:{date:"Sun Jul 19",  time:"3:00 PM ET",  venue:"MetLife Stadium · East Rutherford, NJ"},
+  // ROUND OF 16
+  lr16_0:{date:"Sat Jul 4",  time:"5:00 PM ET",   venue:"Lincoln Financial Field · Philadelphia, PA"},  // M89
+  lr16_1:{date:"Sat Jul 4",  time:"2:00 PM ET",   venue:"NRG Stadium · Houston, TX"},                  // M90
+  lr16_2:{date:"Mon Jul 6",  time:"4:00 PM ET",   venue:"AT&T Stadium · Arlington, TX"},               // M93
+  lr16_3:{date:"Mon Jul 6",  time:"11:00 PM ET",  venue:"Lumen Field · Seattle, WA"},                  // M94
+  rr16_0:{date:"Sun Jul 5",  time:"4:00 PM ET",   venue:"MetLife Stadium · East Rutherford, NJ"},      // M91
+  rr16_1:{date:"Sun Jul 5",  time:"9:00 PM ET",   venue:"Estadio Azteca · Mexico City, MX"},           // M92
+  rr16_2:{date:"Tue Jul 7",  time:"12:00 PM ET",  venue:"Mercedes-Benz Stadium · Atlanta, GA"},        // M95
+  rr16_3:{date:"Tue Jul 7",  time:"7:00 PM ET",   venue:"BC Place · Vancouver, Canada"},               // M96
+  // QUARTERFINALS
+  rqf_0:{date:"Thu Jul 9",   time:"4:00 PM ET",   venue:"Gillette Stadium · Foxborough, MA"},          // M97
+  lqf_0:{date:"Fri Jul 10",  time:"6:00 PM ET",   venue:"SoFi Stadium · Inglewood, CA"},              // M98
+  rqf_1:{date:"Sat Jul 11",  time:"5:00 PM ET",   venue:"Hard Rock Stadium · Miami Gardens, FL"},      // M99
+  lqf_1:{date:"Sat Jul 11",  time:"10:00 PM ET",  venue:"Arrowhead Stadium · Kansas City, MO"},        // M100
+  // SEMIFINALS
+  lsf_0:{date:"Tue Jul 14",  time:"4:00 PM ET",   venue:"AT&T Stadium · Arlington, TX"},               // M101
+  rsf_0:{date:"Wed Jul 15",  time:"3:00 PM ET",   venue:"Mercedes-Benz Stadium · Atlanta, GA"},        // M102
+  // FINAL
+  fin_0:{date:"Sun Jul 19",  time:"3:00 PM ET",   venue:"MetLife Stadium · East Rutherford, NJ"},      // M104
 };
 
 function empty(n,poolKey){
@@ -180,15 +179,19 @@ function flagUrl(c){return`https://flagcdn.com/40x30/${c}.png`;}
 
 let S = {lr32:mk(L32),rr32:mk(R32),lr16:empty(4,"lr16"),rr16:empty(4,"rr16"),lqf:empty(2,"lqf"),rqf:empty(2,"rqf"),lsf:empty(1,"lsf"),rsf:empty(1,"rsf"),fin:empty(1,"fin"),open:null};
 
+
+
 const FEED={
-  "lr32_0":{p:"lr16",i:0,s:1},"lr32_1":{p:"lr16",i:0,s:2},
-  "lr32_2":{p:"lr16",i:1,s:1},"lr32_3":{p:"lr16",i:1,s:2},
-  "lr32_4":{p:"lr16",i:2,s:1},"lr32_5":{p:"lr16",i:2,s:2},
-  "lr32_6":{p:"lr16",i:3,s:1},"lr32_7":{p:"lr16",i:3,s:2},
-  "rr32_0":{p:"rr16",i:0,s:1},"rr32_1":{p:"rr16",i:0,s:2},
-  "rr32_2":{p:"rr16",i:1,s:1},"rr32_3":{p:"rr16",i:1,s:2},
-  "rr32_4":{p:"rr16",i:2,s:1},"rr32_5":{p:"rr16",i:2,s:2},
-  "rr32_6":{p:"rr16",i:3,s:1},"rr32_7":{p:"rr16",i:3,s:2},
+  // lr32 → lr16 (verified from audited match numbers)
+  "lr32_0":{p:"lr16",i:0,s:1},"lr32_1":{p:"lr16",i:0,s:2},  // M74+M77 → M89 Philadelphia
+  "lr32_2":{p:"lr16",i:1,s:1},"lr32_3":{p:"lr16",i:1,s:2},  // M73+M75 → M90 Houston
+  "lr32_4":{p:"lr16",i:2,s:1},"lr32_5":{p:"lr16",i:2,s:2},  // M83+M84 → M93 Dallas
+  "lr32_6":{p:"lr16",i:3,s:1},"lr32_7":{p:"lr16",i:3,s:2},  // M81+M82 → M94 Seattle
+  // rr32 → rr16 (verified from audited match numbers)
+  "rr32_0":{p:"rr16",i:0,s:1},"rr32_1":{p:"rr16",i:0,s:2},  // M76+M78 → M91 MetLife NJ
+  "rr32_2":{p:"rr16",i:1,s:1},"rr32_3":{p:"rr16",i:1,s:2},  // M79+M80 → M92 Mexico City
+  "rr32_4":{p:"rr16",i:2,s:1},"rr32_5":{p:"rr16",i:2,s:2},  // M86+M88 → M95 Atlanta
+  "rr32_6":{p:"rr16",i:3,s:1},"rr32_7":{p:"rr16",i:3,s:2},  // M85+M87 → M96 Vancouver
   "lr16_0":{p:"lqf",i:0,s:1},"lr16_1":{p:"lqf",i:0,s:2},
   "lr16_2":{p:"lqf",i:1,s:1},"lr16_3":{p:"lqf",i:1,s:2},
   "rr16_0":{p:"rqf",i:0,s:1},"rr16_1":{p:"rqf",i:0,s:2},
