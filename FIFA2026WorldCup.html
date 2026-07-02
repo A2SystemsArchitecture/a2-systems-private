@@ -246,15 +246,39 @@ function pickWinner(key,slot){
     // Undo: clear this match's winner and remove the team from next round only
     m.winner=null; m.s1=""; m.s2="";
     unpropagateAndClear(key,team);
+    // Also clear the loser from 3rd place if this was a semi
+    updateThirdPlace();
   } else {
     // Switch: remove old winner from next round first, then set new one
     if(m.winner) unpropagateAndClear(key,m.winner);
     m.winner=team;
     propagate(key,team);
+    // Populate 3rd place with semi losers
+    updateThirdPlace();
   }
 
   S.open=null;
   render();
+}
+
+// Populate 3rd place match with losers of both semis
+function updateThirdPlace(){
+  const lsf=S.lsf[0]; const rsf=S.rsf[0];
+  const tp=S.tpl[0];
+  // Slot 1 = loser of lsf_0 (the team that did NOT win)
+  if(lsf.winner && lsf.t1 && lsf.t2){
+    tp.t1 = lsf.winner.n===lsf.t1.n ? lsf.t2 : lsf.t1;
+  } else {
+    tp.t1 = null;
+  }
+  // Slot 2 = loser of rsf_0
+  if(rsf.winner && rsf.t1 && rsf.t2){
+    tp.t2 = rsf.winner.n===rsf.t1.n ? rsf.t2 : rsf.t1;
+  } else {
+    tp.t2 = null;
+  }
+  // Clear 3rd place winner if teams changed
+  tp.winner=null; tp.s1=""; tp.s2="";
 }
 
 function toggleOpen(key){S.open=S.open===key?null:key; render();}
@@ -269,6 +293,7 @@ function confirmScore(key){
       if(m.winner) unpropagateAndClear(key,m.winner);
       m.winner=w;
       propagate(key,w);
+      updateThirdPlace();
     }
   }
   S.open=null; render();
