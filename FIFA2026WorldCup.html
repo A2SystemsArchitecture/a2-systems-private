@@ -119,7 +119,6 @@
 <div class="bracket-wrap">
   <div class="bracket" id="bracket"></div>
 </div>
-<div id="third-place-box" style="padding:0 8px 48px;"></div>
 
 <script>
 // c = ISO 3166-1 alpha-2 for flagcdn.com
@@ -327,8 +326,9 @@ function render(){
     colHTML("lsf","sf","Semi",1)+
     `<div class="center-col">
       <div class="col-label">Final</div>
-      <div style="width:100%;flex:1;display:flex;flex-direction:column;justify-content:center;">
+      <div style="width:100%;flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;">
         ${matchHTML("fin_0")}${champHTML()}
+        <div id="third-place-box"></div>
       </div>
     </div>`+
     colHTML("rsf","sf","Semi",1)+
