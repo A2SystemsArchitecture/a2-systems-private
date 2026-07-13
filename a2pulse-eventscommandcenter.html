@@ -317,6 +317,29 @@ body:not(.unlocked) .pill-wrap select{appearance:none;-webkit-appearance:none;po
     <button class="tb" onclick="delRow()">🗑 Row</button>
     <button class="tb" onclick="openLM()">🔗 Link</button>
   </div>
+  <div class="tg">
+    <span class="tl">IMPORT</span>
+    <button class="tb" onclick="triggerExcelImport()" title="Click or drag Excel file to import">📥 Excel</button>
+    <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this.files[0])">
+  </div>
+</div>
+
+<!-- DROP ZONE OVERLAY -->
+<div id="dropOverlay" style="display:none;position:fixed;inset:0;background:rgba(45,27,78,0.92);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <div style="border:3px dashed #CA8A04;border-radius:16px;padding:48px 64px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:12px;">📥</div>
+    <div style="font-size:22px;font-weight:700;color:#ffffff;margin-bottom:8px;">Drop your Excel file here</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.55);">Supports .xlsx, .xls, .csv — merges into all tabs</div>
+  </div>
+</div>
+
+<!-- IMPORT RESULT MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal" style="width:420px;">
+    <h2 id="importModalTitle">Import Complete</h2>
+    <p id="importModalMsg" style="color:rgba(255,255,255,0.7);font-size:13px;line-height:1.6;margin-bottom:18px;text-align:left;max-height:200px;overflow-y:auto;"></p>
+    <div class="modal-btns"><button class="btn-ok" onclick="document.getElementById('importModal').classList.remove('open')">Done</button></div>
+  </div>
 </div>
 
 <!-- TABS -->
@@ -397,6 +420,7 @@ body:not(.unlocked) .pill-wrap select{appearance:none;-webkit-appearance:none;po
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1563,6 +1587,238 @@ const _fbPoll = setInterval(()=>{
     renderAll(); updateStats();
   }
 }, 100);
+// ============================================================
+// EXCEL IMPORT
+// ============================================================
+
+// Drag and drop anywhere on the page
+document.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  document.getElementById('dropOverlay').style.display='flex';
+});
+document.addEventListener('dragleave', function(e) {
+  if(!e.relatedTarget || e.relatedTarget===document.documentElement) {
+    document.getElementById('dropOverlay').style.display='none';
+  }
+});
+document.addEventListener('drop', function(e) {
+  e.preventDefault();
+  document.getElementById('dropOverlay').style.display='none';
+  const file = e.dataTransfer.files[0];
+  if(file) handleExcelFile(file);
+});
+
+function triggerExcelImport() {
+  document.getElementById('excelFileInput').click();
+}
+
+function handleExcelFile(file) {
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type:'array', cellDates:true});
+      importFromWorkbook(wb, file.name);
+    } catch(err) {
+      showImportResult('Import Failed', 'Could not read the file: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  // Reset input so same file can be re-imported
+  document.getElementById('excelFileInput').value='';
+}
+
+function importFromWorkbook(wb, filename) {
+  let totalAdded = {events:0, deadlines:0, vendors:0, sponsors:0};
+  let log = [];
+
+  wb.SheetNames.forEach(sheetName => {
+    const ws = wb.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+    if(!rows.length) return;
+
+    const lowerSheet = sheetName.toLowerCase();
+    const cols = Object.keys(rows[0]).map(k=>k.toLowerCase().trim());
+
+    // Detect sheet type by name or column headers
+    if(lowerSheet.includes('event') || lowerSheet.includes('calendar') || lowerSheet.includes('master') ||
+       cols.some(c=>c.includes('event')||c.includes('date'))) {
+      const added = mergeEvents(rows);
+      totalAdded.events += added;
+      if(added>0) log.push(sheetName + ': ' + added + ' events merged');
+    }
+    else if(lowerSheet.includes('deadline') || lowerSheet.includes('task') || lowerSheet.includes('due') ||
+            cols.some(c=>c.includes('due')||c.includes('task')||c.includes('deadline'))) {
+      const added = mergeDeadlines(rows);
+      totalAdded.deadlines += added;
+      if(added>0) log.push(sheetName + ': ' + added + ' deadlines merged');
+    }
+    else if(lowerSheet.includes('vendor') || lowerSheet.includes('supplier') ||
+            cols.some(c=>c.includes('vendor')||c.includes('w9')||c.includes('coi'))) {
+      const added = mergeVendors(rows);
+      totalAdded.vendors += added;
+      if(added>0) log.push(sheetName + ': ' + added + ' vendors merged');
+    }
+    else if(lowerSheet.includes('sponsor') || lowerSheet.includes('donor') ||
+            cols.some(c=>c.includes('sponsor')||c.includes('level')||c.includes('committed'))) {
+      const added = mergeSponsors(rows);
+      totalAdded.sponsors += added;
+      if(added>0) log.push(sheetName + ': ' + added + ' sponsors merged');
+    }
+    else {
+      // Default: try to import as events if rows have name/date-like columns
+      const added = mergeEvents(rows);
+      if(added>0) { totalAdded.events+=added; log.push(sheetName + ': ' + added + ' events merged (auto-detected)'); }
+      else log.push(sheetName + ': skipped — no matching columns detected');
+    }
+  });
+
+  const total = totalAdded.events + totalAdded.deadlines + totalAdded.vendors + totalAdded.sponsors;
+  if(total > 0) {
+    renderAll(); updateStats();
+    if(window._fbSave) window._fbSave();
+    showImportResult('Import Complete',
+      'File: ' + filename + '\n\n' + log.join('\n') +
+      '\n\nTotal merged: ' + total + ' records');
+  } else {
+    showImportResult('Nothing Imported',
+      'No matching data found in ' + filename + '.\n\nMake sure your sheet has column headers like: Event, Date, Time, Location, Status, Type, or Due Date, Task, Vendor, Sponsor etc.');
+  }
+}
+
+// ---- COLUMN MATCHER ----
+function findCol(row, aliases) {
+  const keys = Object.keys(row);
+  for(const alias of aliases) {
+    const match = keys.find(k=>k.toLowerCase().trim().includes(alias.toLowerCase()));
+    if(match) return String(row[match]||'').trim();
+  }
+  return '';
+}
+
+// ---- MERGE EVENTS ----
+function mergeEvents(rows) {
+  let added = 0;
+  rows.forEach(row => {
+    const name = findCol(row, ['event','name','title','description']);
+    if(!name) return;
+    // Skip if already exists (match by name)
+    if(EVENTS.find(e=>e.name.toLowerCase()===name.toLowerCase())) return;
+
+    const rawDate = findCol(row, ['date','event date','start date']);
+    let dateStr = 'TBD';
+    if(rawDate) {
+      try {
+        const d = rawDate instanceof Date ? rawDate : new Date(rawDate);
+        if(!isNaN(d.getTime())) {
+          dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        } else { dateStr = String(rawDate); }
+      } catch(e) { dateStr = String(rawDate); }
+    }
+
+    const type = findCol(row, ['type','category','kind']) || 'General';
+    EVENTS.push({
+      name,
+      date: dateStr,
+      time: findCol(row, ['time','start time']) || 'TBD',
+      location: findCol(row, ['location','venue','place']) || 'TBD',
+      type: [type],
+      status: findCol(row, ['status']) || 'Not Started',
+      regReq: findCol(row, ['registration','reg','rsvp']) || 'No',
+      catering: findCol(row, ['catering','food','meals']) || 'No',
+      link: findCol(row, ['link','url','rsvp link']) || '',
+      notes: findCol(row, ['notes','comments','description','note']) || '',
+    });
+    added++;
+  });
+  return added;
+}
+
+// ---- MERGE DEADLINES ----
+function mergeDeadlines(rows) {
+  let added = 0;
+  rows.forEach(row => {
+    const task = findCol(row, ['task','action','item','description','deadline','name']);
+    if(!task) return;
+    if(DL.find(d=>d.task.toLowerCase()===task.toLowerCase())) return;
+
+    const rawDue = findCol(row, ['due','due date','deadline','date']);
+    let dueStr = new Date().toISOString().split('T')[0];
+    if(rawDue) {
+      try {
+        const d = rawDue instanceof Date ? rawDue : new Date(rawDue);
+        if(!isNaN(d.getTime())) dueStr = d.toISOString().split('T')[0];
+      } catch(e) {}
+    }
+
+    DL.push({
+      due: dueStr,
+      task,
+      event: findCol(row, ['event','event name']) || '',
+      priority: findCol(row, ['priority']) || 'Medium',
+      status: findCol(row, ['status']) || 'Open',
+      notes: findCol(row, ['notes','comments']) || '',
+    });
+    added++;
+  });
+  return added;
+}
+
+// ---- MERGE VENDORS ----
+function mergeVendors(rows) {
+  let added = 0;
+  rows.forEach(row => {
+    const name = findCol(row, ['vendor','name','company','supplier']);
+    if(!name) return;
+    if(VN.find(v=>v.name.toLowerCase()===name.toLowerCase())) return;
+    VN.push({
+      name,
+      event: findCol(row, ['event','event name']) || '',
+      service: findCol(row, ['service','type','category']) || '',
+      w9: findCol(row, ['w9','w-9']) || '❌',
+      coi: findCol(row, ['coi','insurance']) || '❌',
+      contract: findCol(row, ['contract']) || '❌',
+      invoice: findCol(row, ['invoice']) || '❌',
+      paid: findCol(row, ['paid','payment']) || '❌',
+      contact: findCol(row, ['contact','email','phone']) || '',
+      notes: findCol(row, ['notes','comments']) || '',
+    });
+    added++;
+  });
+  return added;
+}
+
+// ---- MERGE SPONSORS ----
+function mergeSponsors(rows) {
+  let added = 0;
+  rows.forEach(row => {
+    const name = findCol(row, ['sponsor','name','donor','company']);
+    if(!name) return;
+    if(SP.find(s=>s.name.toLowerCase()===name.toLowerCase())) return;
+    SP.push({
+      name,
+      event: findCol(row, ['event','event name']) || '',
+      level: findCol(row, ['level','tier','type']) || '',
+      amount: findCol(row, ['amount','gift','contribution','pledge']) || '$0',
+      committed: findCol(row, ['committed','commitment']) || '❌',
+      paid: findCol(row, ['paid','payment','received']) || '❌',
+      logo: findCol(row, ['logo']) || '❌',
+      w9: findCol(row, ['w9','w-9']) || '❌',
+      contact: findCol(row, ['contact','email','phone']) || '',
+      notes: findCol(row, ['notes','comments']) || '',
+    });
+    added++;
+  });
+  return added;
+}
+
+function showImportResult(title, msg) {
+  document.getElementById('importModalTitle').textContent = title;
+  document.getElementById('importModalMsg').textContent = msg;
+  document.getElementById('importModal').classList.add('open');
+}
+
 </script>
 </body>
 </html>
