@@ -1795,35 +1795,69 @@ function findCol(row, aliases) {
 // ---- MERGE EVENTS ----
 function mergeEvents(rows) {
   let added = 0;
+
+  // Detect Gulliver spreadsheet format:
+  // Col 0 = True/False flag, Col 4 = Date, Col 6 = Event Name (Description),
+  // Col 7 = Location, Col 8 = Time, Col 3 = Catering Req, Col 1 = Reg. Form
+  const keys = rows.length ? Object.keys(rows[0]) : [];
+  const isGulliverFormat = keys.some(k=>k==='Description') ||
+    (rows[0] && (rows[0]['Event']===true || rows[0]['Event']===false || rows[0]['Event']==='true'));
+
   rows.forEach(row => {
-    const name = findCol(row, ['event','name','title','description']);
-    if(!name) return;
-    // Skip if already exists (match by name)
+    let name, rawDate, time, location, catering, regReq, type;
+
+    if(isGulliverFormat) {
+      // Gulliver calendar spreadsheet: name is in Description column
+      name = String(row['Description'] || row['Event Name'] || '').trim();
+      // Skip rows where name is a boolean, empty, or header-like
+      if(!name || name==='true'||name==='false'||name==='Description'||name==='Event') return;
+      rawDate = row['Event Date'] || row['Date'] || '';
+      time = String(row['Time'] || row['Event Time'] || 'TBD').replace(/\n/g,' ').trim();
+      location = String(row['Location'] || row['Venue'] || 'TBD').replace(/\n/g,' ').trim();
+      catering = (row['Catering Req']===true||String(row['Catering Req']).toLowerCase()==='yes') ? 'Yes' : 'No';
+      regReq = (row['Reg. Form']===true||String(row['Reg. Form']).toLowerCase()==='yes') ? 'Yes' : 'No';
+      type = 'General';
+    } else {
+      // Standard format
+      name = findCol(row, ['event','name','title','description']);
+      if(!name) return;
+      rawDate = findCol(row, ['date','event date','start date']);
+      time = findCol(row, ['time','start time']) || 'TBD';
+      location = findCol(row, ['location','venue','place']) || 'TBD';
+      catering = findCol(row, ['catering','food','meals']) || 'No';
+      regReq = findCol(row, ['registration','reg','rsvp']) || 'No';
+      type = findCol(row, ['type','category','kind']) || 'General';
+    }
+
+    // Skip if already exists
     if(EVENTS.find(e=>e.name.toLowerCase()===name.toLowerCase())) return;
 
-    const rawDate = findCol(row, ['date','event date','start date']);
+    // Parse date
     let dateStr = 'TBD';
     if(rawDate) {
       try {
-        const d = rawDate instanceof Date ? rawDate : new Date(rawDate);
-        if(!isNaN(d.getTime())) {
-          dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-        } else { dateStr = String(rawDate); }
-      } catch(e) { dateStr = String(rawDate); }
+        if(rawDate instanceof Date) {
+          dateStr = rawDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        } else {
+          const d = new Date(rawDate);
+          if(!isNaN(d.getTime())) {
+            dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+          } else { dateStr = String(rawDate).trim(); }
+        }
+      } catch(e) { dateStr = String(rawDate).trim(); }
     }
 
-    const type = findCol(row, ['type','category','kind']) || 'General';
     EVENTS.push({
       name,
       date: dateStr,
-      time: findCol(row, ['time','start time']) || 'TBD',
-      location: findCol(row, ['location','venue','place']) || 'TBD',
+      time: time||'TBD',
+      location: location||'TBD',
       type: [type],
       status: findCol(row, ['status']) || 'Not Started',
-      regReq: findCol(row, ['registration','reg','rsvp']) || 'No',
-      catering: findCol(row, ['catering','food','meals']) || 'No',
-      link: findCol(row, ['link','url','rsvp link']) || '',
-      notes: findCol(row, ['notes','comments','description','note']) || '',
+      regReq,
+      catering,
+      link: findCol(row, ['link','url','rsvp link','registration form']) || '',
+      notes: findCol(row, ['notes','comments','note']) || '',
     });
     added++;
   });
