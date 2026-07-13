@@ -163,7 +163,6 @@ textarea:focus{border-color:var(--plum);background:var(--lavender);}
 </style>
 </head>
 <body>
-
 <div id="auth-overlay">
   <div class="auth-box">
     <div class="auth-logo">
@@ -176,19 +175,13 @@ textarea:focus{border-color:var(--plum);background:var(--lavender);}
     <h2>Sign In</h2>
     <p>Access is restricted to authorized Gulliver Prep Advancement team members.</p>
     <div id="auth-error" class="auth-error"></div>
-    <div class="auth-field">
-      <label for="auth-email">Email Address</label>
-      <input type="email" id="auth-email" placeholder="Enter your email"/>
-    </div>
-    <div class="auth-field">
-      <label for="auth-password">Password</label>
-      <input type="password" id="auth-password" placeholder="Enter your password"/>
-    </div>
+    <div class="auth-field"><label for="auth-email">Email Address</label><input type="email" id="auth-email" placeholder="Enter your email"/></div>
+    <div class="auth-field"><label for="auth-password">Password</label><input type="password" id="auth-password" placeholder="Enter your password"/></div>
     <button class="auth-submit" id="auth-login-btn">Sign In</button>
     <div class="auth-footer">A2 Systems Architecture&#169; &bull; Confidential</div>
   </div>
 </div>
-<div class="auth-user-bar" style="display:none;" id="auth-user-bar">
+<div class="auth-user-bar" id="auth-user-bar" style="display:none;">
   <span id="auth-user-email"></span>
   <button id="auth-signout-btn">Sign Out</button>
 </div>
@@ -427,77 +420,53 @@ function collectSessionData(){const data={version:1,savedAt:new Date().toISOStri
 function saveSession(){const data=collectSessionData();const eventName=data.fields.eventName||"A2-Pulse-Events-Logistics";const safeName=eventName.replace(/[^a-z0-9\-_\s]/gi,"").trim().replace(/\s+/g,"-")||"A2-Pulse-Events-Logistics";const fileName=safeName+"-session.json";const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);const now=new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});const status=document.getElementById("sessionStatus");const evtName=document.getElementById("eventName")?.value||"Session";if(status){status.textContent=evtName+" — Saved at "+now;status.className="session-status saved";}}
 function loadSession(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(e){try{const data=JSON.parse(e.target.result);if(!data.version||!data.fields)throw new Error("Invalid session file");Object.entries(data.fields).forEach(([id,val])=>{if(id==="constituentGroups")return;const el=document.getElementById(id);if(el){el.value=val;if(el.tagName==="TEXTAREA"){el.style.height="auto";el.style.height=el.scrollHeight+"px";}}});const checked=data.fields.constituentGroups||[];document.querySelectorAll("#constituentGroup input[type=checkbox]").forEach(cb=>{cb.checked=checked.includes(cb.value);});Object.entries(data.checklistData||{}).forEach(([tblId,rows])=>{const tbodyRows=document.querySelectorAll("#"+tblId+" tbody tr");rows.forEach((row,i)=>{if(!tbodyRows[i])return;const inp=tbodyRows[i].querySelectorAll("input,select,textarea");if(inp[0])inp[0].value=row.owner||"";if(inp[1])inp[1].value=row.status||"todo";if(inp[2])inp[2].value=row.date||"";if(inp[3]){inp[3].value=row.notes||"";inp[3].style.height="auto";inp[3].style.height=inp[3].scrollHeight+"px";}});});const typeMap={prospectsContainer:"prospect",donorsContainer:"donor",studentsContainer:"student"};Object.entries(data.people||{}).forEach(([cId,entries])=>{const container=document.getElementById(cId);if(!container)return;container.innerHTML="";entries.forEach(entry=>{addPerson(cId,typeMap[cId]);const last=container.lastElementChild;if(!last)return;const name=last.querySelector(".p-name");const notes=last.querySelector(".p-notes");const link=last.querySelector(".p-link");if(name)name.value=entry.name||"";if(notes)notes.value=entry.notes||"";if(link&&entry.link)link.value=entry.link||"";});});updateDisplay();checkDateAlert();const savedAt=data.savedAt?new Date(data.savedAt).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"unknown";const status=document.getElementById("sessionStatus");if(status){status.textContent="Session loaded - saved "+savedAt;status.className="session-status saved";}event.target.value="";}catch(err){alert("Could not load session file. Please make sure you are using a valid A2 Pulse: Events Logistics session .json file.");event.target.value="";}};reader.readAsText(file);}
 /* init called after Firebase auth */
-</script>
-</body></html>`;const blob=new Blob(['\ufeff',html],{type:'application/msword'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Event-Briefing.doc';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
-function openNewEventModal(){document.getElementById('newEventNameInput').value='';document.getElementById('newEventModal').classList.add('active');setTimeout(()=>document.getElementById('newEventNameInput').focus(),100);}
-function closeNewEventModal(){document.getElementById('newEventModal').classList.remove('active');}
-document.getElementById('newEventModal').addEventListener('click',function(e){if(e.target===this)closeNewEventModal();});
-document.getElementById('newEventNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')downloadNewEventFile();if(e.key==='Escape')closeNewEventModal();});
-function downloadNewEventFile(){const rawName=document.getElementById('newEventNameInput').value.trim();const eventLabel=rawName||'New Event';const safeFileName=eventLabel.replace(/[^a-z0-9\-_\s]/gi,'').trim().replace(/\s+/g,'-');const fileName='a2pulse-eventlogistics-'+safeFileName+'.html';const fullSource=document.documentElement.outerHTML;const parser=new DOMParser();const newDoc=parser.parseFromString(fullSource,'text/html');newDoc.querySelectorAll('input[type=text],input[type=number],input[type=url],input[type=date],input[type=time]').forEach(el=>{el.value='';el.removeAttribute('value');});newDoc.querySelectorAll('select').forEach(el=>{el.selectedIndex=0;[...el.options].forEach(o=>o.removeAttribute('selected'));});newDoc.querySelectorAll('textarea').forEach(el=>{el.value='';el.textContent='';});newDoc.querySelectorAll('input[type=checkbox]').forEach(el=>{el.checked=false;el.removeAttribute('checked');});['prospectsContainer','donorsContainer','studentsContainer'].forEach(id=>{const c=newDoc.getElementById(id);if(c)c.innerHTML='';});const bo=newDoc.getElementById('briefingOutput');if(bo){bo.innerHTML='';bo.style.display='none';}const ab=newDoc.getElementById('alertBanner');if(ab){ab.style.display='none';ab.textContent='';}const nd=newDoc.getElementById('eventNameDisplay');if(nd)nd.textContent='No Event Loaded';newDoc.title='A2 Pulse: Events Logistics | '+eventLabel+' | A2 Systems Architecture';const modal=newDoc.getElementById('newEventModal');if(modal)modal.classList.remove('active');const output='<!DOCTYPE html>\n'+newDoc.documentElement.outerHTML;const blob=new Blob([output],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);closeNewEventModal();}
-function collectSessionData(){const data={version:1,savedAt:new Date().toISOString(),fields:{},checklistData:{},people:{}};const fieldIds=["eventName","eventDate","eventTime","eventLocation","eventType","locationType","guestCap","rsvpCount","eventFormat","programOutcome","eventTimeline","leadershipRemarks","planningDate","briefingDate","leadershipBriefingDate","botBriefingDate","debriefDate","eventAssets","eventNotes","rsvpLink","researchLink","botResearchLink","talkingPointsLink","invitationStrategy","botAttending","botUnable","gulliverAttendees","talkingPoints"];fieldIds.forEach(id=>{const el=document.getElementById(id);if(el)data.fields[id]=el.value;});data.fields.constituentGroups=[...document.querySelectorAll("#constituentGroup input:checked")].map(c=>c.value);["tbl-owner","tbl-data","tbl-comms","tbl-events","tbl-budget","tbl-security"].forEach(tblId=>{const rows=[];document.querySelectorAll("#"+tblId+" tbody tr").forEach(tr=>{const inp=tr.querySelectorAll("input,select,textarea");rows.push({owner:inp[0]?inp[0].value:"",status:inp[1]?inp[1].value:"todo",date:inp[2]?inp[2].value:"",notes:inp[3]?inp[3].value:""});});data.checklistData[tblId]=rows;});["prospectsContainer","donorsContainer","studentsContainer"].forEach(cId=>{const entries=[];document.querySelectorAll("#"+cId+" .person-entry").forEach(entry=>{const e={};const name=entry.querySelector(".p-name");const notes=entry.querySelector(".p-notes");const link=entry.querySelector(".p-link");if(name)e.name=name.value;if(notes)e.notes=notes.value;if(link)e.link=link.value;entries.push(e);});data.people[cId]=entries;});return data;}
-function saveSession(){const data=collectSessionData();const eventName=data.fields.eventName||"A2-Pulse-Events-Logistics";const safeName=eventName.replace(/[^a-z0-9\-_\s]/gi,"").trim().replace(/\s+/g,"-")||"A2-Pulse-Events-Logistics";const fileName=safeName+"-session.json";const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);const now=new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});const status=document.getElementById("sessionStatus");const evtName=document.getElementById("eventName")?.value||"Session";if(status){status.textContent=evtName+" — Saved at "+now;status.className="session-status saved";}}
-function loadSession(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(e){try{const data=JSON.parse(e.target.result);if(!data.version||!data.fields)throw new Error("Invalid session file");Object.entries(data.fields).forEach(([id,val])=>{if(id==="constituentGroups")return;const el=document.getElementById(id);if(el){el.value=val;if(el.tagName==="TEXTAREA"){el.style.height="auto";el.style.height=el.scrollHeight+"px";}}});const checked=data.fields.constituentGroups||[];document.querySelectorAll("#constituentGroup input[type=checkbox]").forEach(cb=>{cb.checked=checked.includes(cb.value);});Object.entries(data.checklistData||{}).forEach(([tblId,rows])=>{const tbodyRows=document.querySelectorAll("#"+tblId+" tbody tr");rows.forEach((row,i)=>{if(!tbodyRows[i])return;const inp=tbodyRows[i].querySelectorAll("input,select,textarea");if(inp[0])inp[0].value=row.owner||"";if(inp[1])inp[1].value=row.status||"todo";if(inp[2])inp[2].value=row.date||"";if(inp[3]){inp[3].value=row.notes||"";inp[3].style.height="auto";inp[3].style.height=inp[3].scrollHeight+"px";}});});const typeMap={prospectsContainer:"prospect",donorsContainer:"donor",studentsContainer:"student"};Object.entries(data.people||{}).forEach(([cId,entries])=>{const container=document.getElementById(cId);if(!container)return;container.innerHTML="";entries.forEach(entry=>{addPerson(cId,typeMap[cId]);const last=container.lastElementChild;if(!last)return;const name=last.querySelector(".p-name");const notes=last.querySelector(".p-notes");const link=last.querySelector(".p-link");if(name)name.value=entry.name||"";if(notes)notes.value=entry.notes||"";if(link&&entry.link)link.value=entry.link||"";});});updateDisplay();checkDateAlert();const savedAt=data.savedAt?new Date(data.savedAt).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"unknown";const status=document.getElementById("sessionStatus");if(status){status.textContent="Session loaded - saved "+savedAt;status.className="session-status saved";}event.target.value="";}catch(err){alert("Could not load session file. Please make sure you are using a valid A2 Pulse: Events Logistics session .json file.");event.target.value="";}};reader.readAsText(file);}
-/* init called after Firebase auth */
+
+function loadFromURLParams(){
+  const params=new URLSearchParams(window.location.search);
+  if(!params.has('eventName')) return;
+  const fieldMap={eventName:'eventName',eventDate:'eventDate',eventTime:'eventTime',eventLocation:'eventLocation',eventNotes:'eventNotes',eventLink:'rsvpLink'};
+  Object.entries(fieldMap).forEach(([param,fieldId])=>{
+    const val=params.get(param);
+    if(val){const el=document.getElementById(fieldId);if(el)el.value=val;}
+  });
+  const typeVal=params.get('eventType');
+  if(typeVal){const sel=document.getElementById('eventType');if(sel)[...sel.options].forEach(o=>{if(o.value===typeVal||o.text===typeVal)sel.value=o.value;});}
+  updateDisplay();checkDateAlert();
+  const banner=document.getElementById('alertBanner');
+  if(banner){banner.className='alert-banner green';banner.textContent='Event loaded from Command Center: '+params.get('eventName');banner.style.display='block';setTimeout(()=>{banner.style.display='none';},4000);}
+}
 </script>
 </div><!-- /app-content -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBt2DP9R_CfShFui5jaDIisVl6zJDk0NjI",
-    authDomain: "a2-pulse-event-command-center.firebaseapp.com",
-    projectId: "a2-pulse-event-command-center",
-    storageBucket: "a2-pulse-event-command-center.firebasestorage.app",
-    messagingSenderId: "168920225490",
-    appId: "1:168920225490:web:723777a759b2dc8e9abf0b"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
+  const firebaseConfig={apiKey:"AIzaSyBt2DP9R_CfShFui5jaDIisVl6zJDk0NjI",authDomain:"a2-pulse-event-command-center.firebaseapp.com",projectId:"a2-pulse-event-command-center",storageBucket:"a2-pulse-event-command-center.firebasestorage.app",messagingSenderId:"168920225490",appId:"1:168920225490:web:723777a759b2dc8e9abf0b"};
+  const app=initializeApp(firebaseConfig);
+  const auth=getAuth(app);
+  onAuthStateChanged(auth,(user)=>{
+    if(user){
       document.getElementById('auth-overlay').classList.add('hidden');
       document.getElementById('app-content').classList.add('visible');
-      const bar = document.getElementById('auth-user-bar');
-      if(bar) bar.style.display = 'flex';
-      document.getElementById('auth-user-email').textContent = user.email;
-      buildTables();
-      checkDateAlert();
+      const bar=document.getElementById('auth-user-bar');if(bar)bar.style.display='flex';
+      document.getElementById('auth-user-email').textContent=user.email;
+      buildTables();checkDateAlert();loadFromURLParams();
     } else {
       document.getElementById('auth-overlay').classList.remove('hidden');
       document.getElementById('app-content').classList.remove('visible');
-      const bar = document.getElementById('auth-user-bar');
-      if(bar) bar.style.display = 'none';
+      const bar=document.getElementById('auth-user-bar');if(bar)bar.style.display='none';
     }
   });
-
-  document.getElementById('auth-login-btn').addEventListener('click', async () => {
-    const email = document.getElementById('auth-email').value.trim();
-    const password = document.getElementById('auth-password').value;
-    const errEl = document.getElementById('auth-error');
+  document.getElementById('auth-login-btn').addEventListener('click',async()=>{
+    const email=document.getElementById('auth-email').value.trim();
+    const password=document.getElementById('auth-password').value;
+    const errEl=document.getElementById('auth-error');
     errEl.classList.remove('visible');
-    if (!email || !password) {
-      errEl.textContent = 'Please enter your email and password.';
-      errEl.classList.add('visible');
-      return;
-    }
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch(err) {
-      errEl.textContent = 'Incorrect email or password. Please try again.';
-      errEl.classList.add('visible');
-    }
+    if(!email||!password){errEl.textContent='Please enter your email and password.';errEl.classList.add('visible');return;}
+    try{await signInWithEmailAndPassword(auth,email,password);}
+    catch(err){errEl.textContent='Incorrect email or password. Please try again.';errEl.classList.add('visible');}
   });
-
-  document.getElementById('auth-password').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') document.getElementById('auth-login-btn').click();
-  });
-
-  document.getElementById('auth-signout-btn').addEventListener('click', async () => {
-    await signOut(auth);
-  });
+  document.getElementById('auth-password').addEventListener('keydown',(e)=>{if(e.key==='Enter')document.getElementById('auth-login-btn').click();});
+  document.getElementById('auth-signout-btn').addEventListener('click',async()=>{await signOut(auth);});
 </script>
 </body>
 </html>
