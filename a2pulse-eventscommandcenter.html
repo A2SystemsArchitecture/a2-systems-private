@@ -1044,11 +1044,26 @@ let monthSortState={};
 const MONTH_ORDER=["Aug 2026","Sept 2026","Oct 2026","Nov 2026","Dec 2026","Jan 2027","Feb 2027","Mar 2027","Apr 2027","May 2027","Jun 2027","Jul 2027"];
 
 function getMonthKey(dateStr) {
-  const map={Aug:"Aug 2026",Sept:"Sept 2026",Oct:"Oct 2026",Nov:"Nov 2026",Dec:"Dec 2026",Jan:"Jan 2027",Feb:"Feb 2027",Mar:"Mar 2027",Apr:"Apr 2027",May:"May 2027",Jun:"Jun 2027",Jul:"Jul 2027"};
-  for(const [abbr,label] of Object.entries(map)) {
-    if(dateStr.startsWith(abbr)) return label;
+  if(!dateStr||dateStr==='TBD') return 'TBD';
+  // Handle "Aug 17, 2026" or "Sept 2, 2026" format
+  const map={
+    'Aug 2026':'Aug 2026','Sept 2026':'Sept 2026','Oct 2026':'Oct 2026',
+    'Nov 2026':'Nov 2026','Dec 2026':'Dec 2026','Jul 2026':'Jul 2026',
+    'Jan 2027':'Jan 2027','Feb 2027':'Feb 2027','Mar 2027':'Mar 2027',
+    'Apr 2027':'Apr 2027','May 2027':'May 2027','Jun 2027':'Jun 2027','Jul 2027':'Jul 2027'
+  };
+  // Extract month and year from "Mon D, YYYY" format
+  const m = dateStr.match(/^(\w+)\s+\d+,\s*(\d{4})/);
+  if(m) {
+    const key = m[1] + ' ' + m[2];
+    if(map[key]) return map[key];
+    return key;
   }
-  return dateStr.split(' ')[0];
+  // Fallback: try startsWith for legacy formats
+  for(const [abbr,label] of Object.entries(map)) {
+    if(dateStr.startsWith(abbr.split(' ')[0])) return label;
+  }
+  return 'TBD';
 }
 
 // Multi-type chip picker cell
