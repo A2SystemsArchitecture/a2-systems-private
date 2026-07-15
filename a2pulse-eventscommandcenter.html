@@ -711,10 +711,10 @@ const EVENTS = [
 ];
 
 const ST_OPTS=["Not Started","Planning","Sponsorship","Registration Open","In Progress","At Risk","Completed","Cancelled"];
-const TY_OPTS=["Development","Parent Association","Alumni","Fundraiser","General","Engagement"];
+const TY_OPTS=["Development","Parent Association","Alumni","Fundraiser","General","Engagement","Stewardship"];
 const YN_OPTS=["Yes","No"];
 const ST_PILL={"Completed":"pill-green","Planning":"pill-plum","Sponsorship":"pill-yellow","Registration Open":"pill-green","In Progress":"pill-yellow","At Risk":"pill-red","Not Started":"pill-gray","Cancelled":"pill-gray"};
-const TY_CLS={"Development":"type-dev","Parent Association":"type-pa","Alumni":"type-alumni","Fundraiser":"type-fund","General":"type-general","Engagement":"type-dev"};
+const TY_CLS={"Development":"type-dev","Parent Association":"type-pa","Alumni":"type-alumni","Fundraiser":"type-fund","General":"type-general","Engagement":"type-dev","Stewardship":"type-dev"};
 
 const DEPS=["Date Confirmed","Location Contract Signed","Budget Approved","Calendar Invite Sent","RSVP Page / OneCause Live","Briefing Meeting Scheduled","Debrief Meeting Scheduled","Sponsor List Finalized","Sponsor Logos Received","Save the Date Sent","Catering Confirmed","Catering Guarantee Submitted","Volunteer Plan Complete","Volunteer Assignments Sent","Run of Show Drafted","Print Materials Ordered","Shirt / Swag Order Submitted","W-9 Received (Vendors)","Event Folder Created","Communications Notified","Post-Event Thank-You Sent","Revenue Reconciliation Complete"];
 const SYM=["❌","🟡","✅","🔴","N/A"];
@@ -1041,27 +1041,31 @@ const M_COLS=[
 let monthSortState={};
 
 // Canonical month order for sorting groups
-const MONTH_ORDER=["Aug 2026","Sept 2026","Oct 2026","Nov 2026","Dec 2026","Jan 2027","Feb 2027","Mar 2027","Apr 2027","May 2027","Jun 2027","Jul 2027"];
+const MONTH_ORDER=["Jul 2026","Aug 2026","Sept 2026","Oct 2026","Nov 2026","Dec 2026","Jan 2027","Feb 2027","Mar 2027","Apr 2027","May 2027","Jun 2027","Jul 2027"];
 
 function getMonthKey(dateStr) {
   if(!dateStr||dateStr==='TBD') return 'TBD';
-  // Handle "Aug 17, 2026" or "Sept 2, 2026" format
-  const map={
-    'Aug 2026':'Aug 2026','Sept 2026':'Sept 2026','Oct 2026':'Oct 2026',
-    'Nov 2026':'Nov 2026','Dec 2026':'Dec 2026','Jul 2026':'Jul 2026',
-    'Jan 2027':'Jan 2027','Feb 2027':'Feb 2027','Mar 2027':'Mar 2027',
-    'Apr 2027':'Apr 2027','May 2027':'May 2027','Jun 2027':'Jun 2027','Jul 2027':'Jul 2027'
-  };
-  // Extract month and year from "Mon D, YYYY" format
-  const m = dateStr.match(/^(\w+)\s+\d+,\s*(\d{4})/);
+  const MONTH_NUM={'jan':1,'feb':2,'mar':3,'apr':4,'may':5,'jun':6,'jul':7,'aug':8,'sept':9,'sep':9,'oct':10,'nov':11,'dec':12};
+  const MONTH_LABEL={1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',7:'Jul',8:'Aug',9:'Sept',10:'Oct',11:'Nov',12:'Dec'};
+
+  // Format 1: "Aug 17, 2026" or "Sept 2, 2026" -> has year
+  let m = dateStr.match(/^(\w+)\s+\d+,\s*(\d{4})/);
   if(m) {
-    const key = m[1] + ' ' + m[2];
-    if(map[key]) return map[key];
-    return key;
+    const mn = MONTH_NUM[m[1].toLowerCase()];
+    const yr = parseInt(m[2]);
+    if(mn && yr) return MONTH_LABEL[mn] + ' ' + yr;
   }
-  // Fallback: try startsWith for legacy formats
-  for(const [abbr,label] of Object.entries(map)) {
-    if(dateStr.startsWith(abbr.split(' ')[0])) return label;
+  // Format 2: "Wednesday, Sept 2" or "Thursday, Aug 28" -> weekday prefix, no year
+  m = dateStr.match(/^(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),?\s+(\w+)\s+\d+/i);
+  if(m) {
+    const mn = MONTH_NUM[m[1].toLowerCase()];
+    if(mn) { const yr = mn >= 7 ? 2026 : 2027; return MONTH_LABEL[mn] + ' ' + yr; }
+  }
+  // Format 3: "Sept 2" no year
+  m = dateStr.match(/^(\w+)\s+\d+$/);
+  if(m) {
+    const mn = MONTH_NUM[m[1].toLowerCase()];
+    if(mn) { const yr = mn >= 7 ? 2026 : 2027; return MONTH_LABEL[mn] + ' ' + yr; }
   }
   return 'TBD';
 }
