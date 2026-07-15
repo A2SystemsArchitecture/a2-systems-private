@@ -291,6 +291,27 @@ tr.selected .open-logistics-btn{background:#e6a805;}
 .restore-close-btn{background:transparent;border:1px solid #d4c9ee;color:#6b6560;padding:8px 18px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;margin-top:16px;}
 .restore-close-btn:hover{border-color:#2D1B4E;color:#2D1B4E;}
 .no-revisions{font-size:13px;color:#6b6560;font-family:Arial,sans-serif;text-align:center;padding:20px 0;}
+
+/* ── IMPORT CONFIRMATION MODAL ── */
+#importConfirmModal{display:none;position:fixed;inset:0;background:rgba(45,27,78,.8);z-index:5000;align-items:center;justify-content:center;}
+#importConfirmModal.open{display:flex;}
+.import-confirm-box{background:#fff;border-top:4px solid #CA8A04;padding:32px;max-width:520px;width:92%;max-height:80vh;overflow-y:auto;}
+.import-confirm-box h3{color:#2D1B4E;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:Arial,sans-serif;}
+.import-confirm-box .ic-sub{font-size:12px;color:#6b6560;margin-bottom:20px;line-height:1.5;font-family:Arial,sans-serif;}
+.import-preview-item{border:1px solid #e2d9f3;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.import-preview-item.skip{background:#fafafa;opacity:.6;}
+.import-preview-item .ip-left{flex:1;}
+.import-preview-item .ip-tab{font-size:13px;font-weight:700;color:#2D1B4E;font-family:Arial,sans-serif;}
+.import-preview-item .ip-detail{font-size:11px;color:#6b6560;margin-top:3px;font-family:Arial,sans-serif;}
+.import-preview-item .ip-badge{font-size:10px;font-weight:700;padding:3px 10px;text-transform:uppercase;letter-spacing:.5px;font-family:Arial,sans-serif;white-space:nowrap;}
+.ip-badge.will-import{background:#dcfce7;color:#166534;}
+.ip-badge.will-skip{background:#f3f4f6;color:#6b7280;}
+.import-confirm-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+.ic-confirm-btn{background:#CA8A04;border:none;color:#2D1B4E;padding:10px 24px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;transition:background .2s;}
+.ic-confirm-btn:hover{background:#e6a805;}
+.ic-cancel-btn{background:transparent;border:1px solid #d4c9ee;color:#6b6560;padding:10px 24px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
+.ic-cancel-btn:hover{border-color:#2D1B4E;color:#2D1B4E;}
+.import-warning{background:#fef9c3;border:1px solid #fde047;padding:10px 14px;font-size:12px;color:#854d0e;margin-bottom:16px;font-family:Arial,sans-serif;line-height:1.5;}
 </style>
 </head>
 <body>
@@ -391,6 +412,19 @@ tr.selected .open-logistics-btn{background:#e6a805;}
   </div>
 </div>
 
+<!-- IMPORT CONFIRMATION MODAL -->
+<div id="importConfirmModal">
+  <div class="import-confirm-box">
+    <h3>Confirm Import</h3>
+    <p class="ic-sub">Review what will be imported before proceeding. Only tabs shown as WILL IMPORT will affect your data.</p>
+    <div class="import-warning" id="importConfirmWarning" style="display:none;"></div>
+    <div id="importPreviewList"></div>
+    <div class="import-confirm-actions">
+      <button class="ic-cancel-btn" onclick="cancelImportConfirm()">Cancel</button>
+      <button class="ic-confirm-btn" id="icConfirmBtn" onclick="proceedWithImport()">Import</button>
+    </div>
+  </div>
+</div>
 <!-- DROP ZONE OVERLAY -->
 <div id="dropOverlay" style="display:none;position:fixed;inset:0;background:rgba(45,27,78,0.92);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
   <div style="border:3px dashed #CA8A04;border-radius:16px;padding:48px 64px;text-align:center;">
@@ -677,10 +711,10 @@ const EVENTS = [
 ];
 
 const ST_OPTS=["Not Started","Planning","Sponsorship","Registration Open","In Progress","At Risk","Completed","Cancelled"];
-const TY_OPTS=["Development","Parent Association","Alumni","Fundraiser","Parent","General","Engagement"];
+const TY_OPTS=["Development","Parent Association","Alumni","Fundraiser","General","Engagement"];
 const YN_OPTS=["Yes","No"];
 const ST_PILL={"Completed":"pill-green","Planning":"pill-plum","Sponsorship":"pill-yellow","Registration Open":"pill-green","In Progress":"pill-yellow","At Risk":"pill-red","Not Started":"pill-gray","Cancelled":"pill-gray"};
-const TY_CLS={"Development":"type-dev","Parent Association":"type-pa","Alumni":"type-alumni","Fundraiser":"type-fund","Parent":"type-pa","General":"type-general","Engagement":"type-dev"};
+const TY_CLS={"Development":"type-dev","Parent Association":"type-pa","Alumni":"type-alumni","Fundraiser":"type-fund","General":"type-general","Engagement":"type-dev"};
 
 const DEPS=["Date Confirmed","Location Contract Signed","Budget Approved","Calendar Invite Sent","RSVP Page / OneCause Live","Briefing Meeting Scheduled","Debrief Meeting Scheduled","Sponsor List Finalized","Sponsor Logos Received","Save the Date Sent","Catering Confirmed","Catering Guarantee Submitted","Volunteer Plan Complete","Volunteer Assignments Sent","Run of Show Drafted","Print Materials Ordered","Shirt / Swag Order Submitted","W-9 Received (Vendors)","Event Folder Created","Communications Notified","Post-Event Thank-You Sent","Revenue Reconciliation Complete"];
 const SYM=["❌","🟡","✅","🔴","N/A"];
@@ -1910,14 +1944,102 @@ function handleExcelFile(file) {
     try {
       const data = new Uint8Array(e.target.result);
       const wb = XLSX.read(data, {type:'array', cellDates:true});
-      importFromWorkbook(wb, file.name);
+      showImportConfirm(wb, file.name);
     } catch(err) {
       showImportResult('Import Failed', 'Could not read the file: ' + err.message);
     }
   };
   reader.readAsArrayBuffer(file);
-  // Reset input so same file can be re-imported
   document.getElementById('excelFileInput').value='';
+}
+
+let _pendingImportWb = null;
+let _pendingImportFilename = '';
+
+function showImportConfirm(wb, filename) {
+  _pendingImportWb = wb;
+  _pendingImportFilename = filename;
+
+  const MASTER_NAMES = ['master calendar','master','calendar','events'];
+  const DEADLINE_NAMES = ['deadlines','deadline','due dates'];
+  const VENDOR_NAMES = ['vendors','vendor','vendors and sponsors'];
+  const SPONSOR_NAMES = ['sponsors','sponsor'];
+
+  const list = document.getElementById('importPreviewList');
+  const warning = document.getElementById('importConfirmWarning');
+  list.innerHTML = '';
+  warning.style.display = 'none';
+
+  let willImportCount = 0;
+  let willSkipCount = 0;
+
+  wb.SheetNames.forEach(sheetName => {
+    const ws = wb.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+    const lowerSheet = sheetName.toLowerCase().trim();
+    const div = document.createElement('div');
+
+    let type = null;
+    let rowCount = rows.length;
+    let skipReason = '';
+
+    if(MASTER_NAMES.some(n=>lowerSheet===n||lowerSheet.startsWith(n))) {
+      const cols = rows.length ? Object.keys(rows[0]).map(k=>k.toLowerCase().trim()) : [];
+      const hasEventCol = cols.some(c=>c==='event name'||c==='name'||c==='event');
+      if(hasEventCol){ type='Master Calendar'; }
+      else { skipReason = 'No Event Name column found'; }
+    } else if(DEADLINE_NAMES.some(n=>lowerSheet===n||lowerSheet.startsWith(n))) {
+      type='Deadlines';
+    } else if(VENDOR_NAMES.some(n=>lowerSheet===n||lowerSheet.startsWith(n))) {
+      type='Vendors';
+    } else if(SPONSOR_NAMES.some(n=>lowerSheet===n||lowerSheet.startsWith(n))) {
+      type='Sponsors';
+    } else {
+      skipReason = 'Tab name not recognised';
+    }
+
+    const willImport = !!type;
+    if(willImport) willImportCount++;
+    else willSkipCount++;
+
+    div.className = 'import-preview-item' + (willImport ? '' : ' skip');
+    div.innerHTML = `
+      <div class="ip-left">
+        <div class="ip-tab">${sheetName}</div>
+        <div class="ip-detail">${willImport ? rowCount + ' rows &rarr; ' + type : 'Will be skipped: ' + skipReason}</div>
+      </div>
+      <div class="ip-badge ${willImport ? 'will-import' : 'will-skip'}">${willImport ? 'Will Import' : 'Skip'}</div>`;
+    list.appendChild(div);
+  });
+
+  if(willImportCount === 0) {
+    warning.textContent = 'No tabs in this file match the expected names (Master Calendar, Deadlines, Vendors, Sponsors). Nothing will be imported.';
+    warning.style.display = 'block';
+    document.getElementById('icConfirmBtn').disabled = true;
+  } else {
+    document.getElementById('icConfirmBtn').disabled = false;
+    if(willSkipCount > 0) {
+      warning.textContent = willSkipCount + ' tab' + (willSkipCount>1?'s':'') + ' will be skipped. Only highlighted tabs above will affect your data.';
+      warning.style.display = 'block';
+    }
+  }
+
+  document.getElementById('importConfirmModal').classList.add('open');
+}
+
+function cancelImportConfirm() {
+  document.getElementById('importConfirmModal').classList.remove('open');
+  _pendingImportWb = null;
+  _pendingImportFilename = '';
+}
+
+function proceedWithImport() {
+  document.getElementById('importConfirmModal').classList.remove('open');
+  if(_pendingImportWb) {
+    importFromWorkbook(_pendingImportWb, _pendingImportFilename);
+    _pendingImportWb = null;
+    _pendingImportFilename = '';
+  }
 }
 
 function importFromWorkbook(wb, filename) {
@@ -1930,44 +2052,47 @@ function importFromWorkbook(wb, filename) {
   let totalAdded = {events:0, deadlines:0, vendors:0, sponsors:0};
   let log = [];
 
+  // STRICT TAB MATCHING — only process sheets that exactly match known tab names
+  // This prevents header rows, checklist items, and other data from being imported as events
+  const MASTER_NAMES = ['master calendar','master','calendar','events'];
+  const DEADLINE_NAMES = ['deadlines','deadline','due dates'];
+  const VENDOR_NAMES = ['vendors','vendor','vendors and sponsors'];
+  const SPONSOR_NAMES = ['sponsors','sponsor'];
+
   wb.SheetNames.forEach(sheetName => {
     const ws = wb.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
     if(!rows.length) return;
 
-    const lowerSheet = sheetName.toLowerCase();
-    const cols = Object.keys(rows[0]).map(k=>k.toLowerCase().trim());
+    const lowerSheet = sheetName.toLowerCase().trim();
 
-    // Detect sheet type by name or column headers
-    if(lowerSheet.includes('event') || lowerSheet.includes('calendar') || lowerSheet.includes('master') ||
-       cols.some(c=>c.includes('event')||c.includes('date'))) {
+    // Only process sheets with names that exactly match known types
+    if(MASTER_NAMES.some(n=>lowerSheet===n||lowerSheet.startsWith(n))) {
+      // Extra guard: first row must have an 'Event Name' or 'name' column
+      const cols = Object.keys(rows[0]).map(k=>k.toLowerCase().trim());
+      const hasEventCol = cols.some(c=>c==='event name'||c==='name'||c==='event');
+      if(!hasEventCol){ log.push(sheetName + ': skipped — no Event Name column found'); return; }
       const added = mergeEvents(rows);
       totalAdded.events += added;
       if(added>0) log.push(sheetName + ': ' + added + ' events merged');
     }
-    else if(lowerSheet.includes('deadline') || lowerSheet.includes('task') || lowerSheet.includes('due') ||
-            cols.some(c=>c.includes('due')||c.includes('task')||c.includes('deadline'))) {
+    else if(DEADLINE_NAMES.some(n=>lowerSheet===n||lowerSheet.startsWith(n))) {
       const added = mergeDeadlines(rows);
       totalAdded.deadlines += added;
       if(added>0) log.push(sheetName + ': ' + added + ' deadlines merged');
     }
-    else if(lowerSheet.includes('vendor') || lowerSheet.includes('supplier') ||
-            cols.some(c=>c.includes('vendor')||c.includes('w9')||c.includes('coi'))) {
+    else if(VENDOR_NAMES.some(n=>lowerSheet===n||lowerSheet.startsWith(n))) {
       const added = mergeVendors(rows);
       totalAdded.vendors += added;
       if(added>0) log.push(sheetName + ': ' + added + ' vendors merged');
     }
-    else if(lowerSheet.includes('sponsor') || lowerSheet.includes('donor') ||
-            cols.some(c=>c.includes('sponsor')||c.includes('level')||c.includes('committed'))) {
+    else if(SPONSOR_NAMES.some(n=>lowerSheet===n||lowerSheet.startsWith(n))) {
       const added = mergeSponsors(rows);
       totalAdded.sponsors += added;
       if(added>0) log.push(sheetName + ': ' + added + ' sponsors merged');
     }
     else {
-      // Default: try to import as events if rows have name/date-like columns
-      const added = mergeEvents(rows);
-      if(added>0) { totalAdded.events+=added; log.push(sheetName + ': ' + added + ' events merged (auto-detected)'); }
-      else log.push(sheetName + ': skipped — no matching columns detected');
+      log.push(sheetName + ': skipped — tab name not recognised as Master Calendar, Deadlines, Vendors, or Sponsors');
     }
   });
 
