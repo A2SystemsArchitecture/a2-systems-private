@@ -244,6 +244,9 @@ body:not(.unlocked) .pill-wrap select{appearance:none;-webkit-appearance:none;po
   .toolbar{display:none;}
   .main{padding:12px;}
 }
+
+.open-logistics-btn{background:#CA8A04;border:none;color:#2D1B4E;font-size:10px;font-weight:700;padding:4px 8px;cursor:pointer;border-radius:2px;white-space:nowrap;font-family:Arial,sans-serif;letter-spacing:.5px;text-transform:uppercase;transition:background .15s;}
+.open-logistics-btn:hover{background:#e6a805;}
 </style>
 </head>
 <body>
@@ -671,25 +674,7 @@ function rebuildBody(bodyId, cols, data, rowFn) {
     const origIdx=data.indexOf(r);
     const tr=rowFn(r, origIdx);
     tr.dataset.idx=origIdx;
-    tr.onclick=function(e){
-    if(selRow) selRow.classList.remove('selected');
-    selRow=tr;
-    tr.classList.add('selected');
-  };
-  tr.ondblclick=function(){
-    const ev=EVENTS[idx];
-    const params=new URLSearchParams({
-      eventName: ev.name||'',
-      eventDate: ev.date||'',
-      eventTime: ev.time||'',
-      eventLocation: ev.location||'',
-      eventType: Array.isArray(ev.type)?ev.type[0]||'':ev.type||'',
-      eventStatus: ev.status||'',
-      eventLink: ev.link||'',
-      eventNotes: ev.notes||''
-    });
-    window.open('a2pulse-eventlogistics.html?'+params.toString(),'_blank');
-  };
+    tr.onclick=function(){ if(selRow) selRow.classList.remove('selected'); selRow=tr; tr.classList.add('selected'); };
     tb.appendChild(tr);
   });
 
@@ -872,6 +857,7 @@ const M_COLS=[
   {label:"Catering",key:"catering",w:68},
   {label:"Link",key:"link",w:120},
   {label:"Notes",key:"notes",w:145},
+  {label:"Open",key:"_open",w:60},
 ];
 
 // Per-month sort state: { "Aug 2026": {col:"name", dir:"asc"}, ... }
@@ -1031,12 +1017,16 @@ function mRow(row, idx) {
   tr.appendChild(taCell(EVENTS,idx,'catering',{w:'60px'}));
   tr.appendChild(linkCell(EVENTS,idx));
   tr.appendChild(taCell(EVENTS,idx,'notes',{w:'140px'}));
-  tr.onclick=function(e){
-    if(selRow) selRow.classList.remove('selected');
-    selRow=tr;
-    tr.classList.add('selected');
-  };
-  tr.ondblclick=function(){
+  tr.onclick=function(){ if(selRow) selRow.classList.remove('selected'); selRow=tr; tr.classList.add('selected'); };
+  // Open in Event Logistics button
+  const openTd=document.createElement('td');
+  openTd.style.cssText='width:60px;min-width:60px;text-align:center;padding:4px;';
+  const openBtn=document.createElement('button');
+  openBtn.className='open-logistics-btn';
+  openBtn.textContent='Open';
+  openBtn.title='Open in Event Logistics';
+  openBtn.addEventListener('click',function(e){
+    e.stopPropagation();
     const ev=EVENTS[idx];
     const params=new URLSearchParams({
       eventName: ev.name||'',
@@ -1044,12 +1034,13 @@ function mRow(row, idx) {
       eventTime: ev.time||'',
       eventLocation: ev.location||'',
       eventType: Array.isArray(ev.type)?ev.type[0]||'':ev.type||'',
-      eventStatus: ev.status||'',
       eventLink: ev.link||'',
       eventNotes: ev.notes||''
     });
     window.open('a2pulse-eventlogistics.html?'+params.toString(),'_blank');
-  };
+  });
+  openTd.appendChild(openBtn);
+  tr.appendChild(openTd);
   return tr;
 }
 
@@ -1184,25 +1175,7 @@ function rebuildMasterBody() {
     rows.forEach(row=>{ try {
       const origIdx=EVENTS.indexOf(row);
       const tr=mRow(row, origIdx);
-      tr.onclick=function(e){
-    if(selRow) selRow.classList.remove('selected');
-    selRow=tr;
-    tr.classList.add('selected');
-  };
-  tr.ondblclick=function(){
-    const ev=EVENTS[idx];
-    const params=new URLSearchParams({
-      eventName: ev.name||'',
-      eventDate: ev.date||'',
-      eventTime: ev.time||'',
-      eventLocation: ev.location||'',
-      eventType: Array.isArray(ev.type)?ev.type[0]||'':ev.type||'',
-      eventStatus: ev.status||'',
-      eventLink: ev.link||'',
-      eventNotes: ev.notes||''
-    });
-    window.open('a2pulse-eventlogistics.html?'+params.toString(),'_blank');
-  };
+      tr.onclick=function(){ if(selRow) selRow.classList.remove('selected'); selRow=tr; tr.classList.add('selected'); };
       tb.appendChild(tr);
     } catch(err){ console.error('Row render error:', err, row); }});
   });
