@@ -724,6 +724,8 @@ function rebuildBody(bodyId, cols, data, rowFn) {
     if(selRow) selRow.classList.remove('selected');
     selRow=tr;
     tr.classList.add('selected');
+    window._selectedIdx=idx;
+    window._selectedPanel=document.querySelector('.panel.active')?document.querySelector('.panel.active').id:'panel-master';
   };
     tb.appendChild(tr);
   });
@@ -1071,6 +1073,8 @@ function mRow(row, idx) {
     if(selRow) selRow.classList.remove('selected');
     selRow=tr;
     tr.classList.add('selected');
+    window._selectedIdx=idx;
+    window._selectedPanel=document.querySelector('.panel.active')?document.querySelector('.panel.active').id:'panel-master';
   };
   // Open in Event Logistics button
   const openTd=document.createElement('td');
@@ -1233,6 +1237,8 @@ function rebuildMasterBody() {
     if(selRow) selRow.classList.remove('selected');
     selRow=tr;
     tr.classList.add('selected');
+    window._selectedIdx=idx;
+    window._selectedPanel=document.querySelector('.panel.active')?document.querySelector('.panel.active').id:'panel-master';
   };
       tb.appendChild(tr);
     } catch(err){ console.error('Row render error:', err, row); }});
@@ -1518,18 +1524,19 @@ let _pendingDeletePanel=null;
 
 function delRow(){
   if(!unlocked) return;
-  if(!selRow){ alert('Click a row first, then click Delete Row.'); return; }
-  _pendingDeleteIdx=parseInt(selRow.dataset.idx);
-  _pendingDeletePanel=document.querySelector('.panel.active').id;
-  // Get event name for modal
-  let evtName='this event';
-  if(_pendingDeletePanel==='panel-master' && EVENTS[_pendingDeleteIdx]){
-    evtName=EVENTS[_pendingDeleteIdx].name||'this event';
-  } else if(_pendingDeletePanel==='panel-deadlines' && DL[_pendingDeleteIdx]){
-    evtName=DL[_pendingDeleteIdx].task||'this item';
-  } else if(_pendingDeletePanel==='panel-vendors' && VN[_pendingDeleteIdx]){
-    evtName=VN[_pendingDeleteIdx].name||'this item';
+  const idx = (window._selectedIdx !== undefined) ? window._selectedIdx : (selRow ? parseInt(selRow.dataset.idx) : null);
+  const panel = window._selectedPanel || (document.querySelector('.panel.active') ? document.querySelector('.panel.active').id : 'panel-master');
+  if(idx === null || idx === undefined){
+    document.getElementById('delRowBtn').style.outline='2px solid #dc2626';
+    setTimeout(()=>{ document.getElementById('delRowBtn').style.outline=''; },1000);
+    return;
   }
+  let evtName='this event';
+  if(panel==='panel-master' && EVENTS[idx]) evtName=EVENTS[idx].name||'this event';
+  else if(panel==='panel-deadlines' && DL[idx]) evtName=DL[idx].task||'this item';
+  else if(panel==='panel-vendors' && VN[idx]) evtName=VN[idx].name||'this item';
+  _pendingDeleteIdx=idx;
+  _pendingDeletePanel=panel;
   document.getElementById('deleteModalEventName').textContent=evtName;
   document.getElementById('deleteModal').classList.add('open');
 }
@@ -1546,6 +1553,8 @@ function confirmDeleteRow(){
   else if(_pendingDeletePanel==='panel-deadlines'){DL.splice(_pendingDeleteIdx,1);renderDL();}
   else if(_pendingDeletePanel==='panel-vendors'){VN.splice(_pendingDeleteIdx,1);renderVendors();}
   selRow=null;
+  window._selectedIdx=undefined;
+  window._selectedPanel=undefined;
   closeDeleteModal();
   updateStats();
   if(window._fbSave) window._fbSave();
