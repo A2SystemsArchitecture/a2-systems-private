@@ -671,43 +671,43 @@ function refreshTypeUnlockState() {
 // DATA
 // ============================================================
 const EVENTS = [
-  {name:"Orientation",date:"Aug 17, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Hangout for New Families / Uniform Swap",date:"Aug 18, 2026",time:"TBD",location:"TBD",type:["Parent"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Primary & Lower Meet & Greet / Playdate",date:"Aug 19, 2026",time:"TBD",location:"TBD",type:["Parent"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Back to School Night - Primary",date:"Aug 26, 2026",time:"TBD",location:"Primary Campus",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Back to School Night - 5th and 6th",date:"Aug 27, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Development New Parent Breakfast #1",date:"Sept 1, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"Yes",link:"",notes:"TBC"},
-  {name:"Back to School Night - Lower School",date:"Sept 2, 2026",time:"TBD",location:"Lower School Campus",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Back to School Night - 7th and 8th",date:"Sept 3, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Development Breakfast #2",date:"Sept 4, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"Yes",link:"",notes:"TBC"},
-  {name:"Back to School Night - 9th and 12th",date:"Sept 8, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Development Breakfast - Primary/Lower",date:"Sept 8, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"Yes",link:"",notes:"TBC"},
-  {name:"Development Breakfast - Middle",date:"Sept 9, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"Yes",link:"",notes:"TBC"},
-  {name:"1st All-School PA Meeting",date:"Sept 10, 2026",time:"TBD",location:"TBD",type:["Parent Association"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Legacy Family Brunch",date:"Sept 26, 2026",time:"11:00 a.m. - 1:00 p.m.",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"Yes",link:"",notes:""},
-  {name:"Alumni Wine Club",date:"Oct 1, 2026",time:"TBD",location:"TBD",type:["Alumni"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Open House",date:"Oct 6, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Centennial Speaker Series #1",date:"Oct 7, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Open House (2nd)",date:"Oct 8, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"PA Social",date:"Oct 10, 2026",time:"TBD",location:"TBD",type:["Parent Association"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Athletic Hall of Fame & Distinguished Alumni Awards",date:"Oct 15, 2026",time:"TBD",location:"TBD",type:["Alumni"],status:"Planning",regReq:"Yes",catering:"No",link:"",notes:""},
-  {name:"Homecoming BBQ & Tailgate",date:"Oct 16, 2026",time:"3:30 p.m. - 7:00 p.m.",location:"Upper School - Sean Taylor '01 Memorial Field",type:["Alumni"],status:"Planning",regReq:"Yes",catering:"Yes",link:"",notes:"Includes class reunions: 2021, 2016, 2006, 1996, 1991, 1986"},
-  {name:"Fall Alumni Networking",date:"Nov 10, 2026",time:"TBD",location:"TBD",type:["Alumni"],status:"Not Started",regReq:"Yes",catering:"No",link:"",notes:"TBC"},
-  {name:"Giving Circles Reception",date:"Nov 11, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Gulliver Marketplace",date:"Nov 14, 2026",time:"10:00 a.m. - 5:00 p.m.",location:"Upper School Campus",type:["General"],status:"Planning",regReq:"Yes",catering:"No",link:"",notes:""},
-  {name:"IB Pinning Ceremony",date:"Nov 17, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Give Miami Day",date:"Nov 19, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Centennial Speaker Series #2",date:"Jan 13, 2027",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Collegiate Club Launch",date:"Jan 20, 2027",time:"TBD",location:"TBD",type:["Alumni"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:"TBC"},
-  {name:"1926 Society & Leadership Dinner",date:"Jan 27, 2027",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"Yes",link:"",notes:""},
-  {name:"Golf Classic",date:"Feb 8, 2027",time:"TBD",location:"TBD",type:["Fundraiser"],status:"Planning",regReq:"No",catering:"Yes",link:"",notes:""},
-  {name:"Gala",date:"Mar 13, 2027",time:"TBD",location:"TBD",type:["Fundraiser"],status:"Not Started",regReq:"No",catering:"Yes",link:"",notes:""},
-  {name:"Centennial Speaker Series #3",date:"Apr 7, 2027",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Volunteer Appreciation Breakfast",date:"Apr 23, 2027",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"Yes",link:"",notes:""},
-  {name:"Fishing Tournament",date:"May 1, 2027",time:"12:00 p.m. - 5:00 p.m.",location:"Key Biscayne Yacht Club, 180 Harbor Dr, Key Biscayne FL 33149",type:["Fundraiser"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:"TBC"},
-  {name:"Senior Sunset / Pinning",date:"May 6, 2027",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Newly Enrolled Parent Reception",date:"May 11, 2027",time:"5:45 p.m. - 8:00 p.m.",location:"Marian C. Krutulis PK-8 Campus",type:["Parent"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
-  {name:"Final All-School PA Meeting",date:"May 11, 2027",time:"6:00 p.m. - 8:00 p.m.",location:"Marian C. Krutulis PK-8 Campus",type:["Parent Association"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""},
+  {name:"Orientation",date:"Aug 17, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Hangout for New Families / Uniform Swap",date:"Aug 18, 2026",time:"TBD",location:"TBD",type:["Parent"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Primary & Lower Meet & Greet / Playdate",date:"Aug 19, 2026",time:"TBD",location:"TBD",type:["Parent"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Back to School Night - Primary",date:"Aug 26, 2026",time:"TBD",location:"Primary Campus",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Back to School Night - 5th and 6th",date:"Aug 27, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Development New Parent Breakfast #1",date:"Sept 1, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:"TBC"},
+  {name:"Back to School Night - Lower School",date:"Sept 2, 2026",time:"TBD",location:"Lower School Campus",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Back to School Night - 7th and 8th",date:"Sept 3, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Development Breakfast #2",date:"Sept 4, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:"TBC"},
+  {name:"Back to School Night - 9th and 12th",date:"Sept 8, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Development Breakfast - Primary/Lower",date:"Sept 8, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:"TBC"},
+  {name:"Development Breakfast - Middle",date:"Sept 9, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:"TBC"},
+  {name:"1st All-School PA Meeting",date:"Sept 10, 2026",time:"TBD",location:"TBD",type:["Parent Association"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Legacy Family Brunch",date:"Sept 26, 2026",time:"11:00 a.m. - 1:00 p.m.",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:""},
+  {name:"Alumni Wine Club",date:"Oct 1, 2026",time:"TBD",location:"TBD",type:["Alumni"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Open House",date:"Oct 6, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Centennial Speaker Series #1",date:"Oct 7, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Open House (2nd)",date:"Oct 8, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"PA Social",date:"Oct 10, 2026",time:"TBD",location:"TBD",type:["Parent Association"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Athletic Hall of Fame & Distinguished Alumni Awards",date:"Oct 15, 2026",time:"TBD",location:"TBD",type:["Alumni"],status:"Planning",regReq:"Yes",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Homecoming BBQ & Tailgate",date:"Oct 16, 2026",time:"3:30 p.m. - 7:00 p.m.",location:"Upper School - Sean Taylor '01 Memorial Field",type:["Alumni"],status:"Planning",regReq:"Yes",actReq:"No",catering:"Yes",link:"",notes:"Includes class reunions: 2021, 2016, 2006, 1996, 1991, 1986"},
+  {name:"Fall Alumni Networking",date:"Nov 10, 2026",time:"TBD",location:"TBD",type:["Alumni"],status:"Not Started",regReq:"Yes",actReq:"No",catering:"No",link:"",notes:"TBC"},
+  {name:"Giving Circles Reception",date:"Nov 11, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Gulliver Marketplace",date:"Nov 14, 2026",time:"10:00 a.m. - 5:00 p.m.",location:"Upper School Campus",type:["General"],status:"Planning",regReq:"Yes",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"IB Pinning Ceremony",date:"Nov 17, 2026",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Give Miami Day",date:"Nov 19, 2026",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Centennial Speaker Series #2",date:"Jan 13, 2027",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Collegiate Club Launch",date:"Jan 20, 2027",time:"TBD",location:"TBD",type:["Alumni"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:"TBC"},
+  {name:"1926 Society & Leadership Dinner",date:"Jan 27, 2027",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:""},
+  {name:"Golf Classic",date:"Feb 8, 2027",time:"TBD",location:"TBD",type:["Fundraiser"],status:"Planning",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:""},
+  {name:"Gala",date:"Mar 13, 2027",time:"TBD",location:"TBD",type:["Fundraiser"],status:"Not Started",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:""},
+  {name:"Centennial Speaker Series #3",date:"Apr 7, 2027",time:"TBD",location:"TBD",type:["Development"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Volunteer Appreciation Breakfast",date:"Apr 23, 2027",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"Yes",link:"",notes:""},
+  {name:"Fishing Tournament",date:"May 1, 2027",time:"12:00 p.m. - 5:00 p.m.",location:"Key Biscayne Yacht Club, 180 Harbor Dr, Key Biscayne FL 33149",type:["Fundraiser"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:"TBC"},
+  {name:"Senior Sunset / Pinning",date:"May 6, 2027",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Newly Enrolled Parent Reception",date:"May 11, 2027",time:"5:45 p.m. - 8:00 p.m.",location:"Marian C. Krutulis PK-8 Campus",type:["Parent"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
+  {name:"Final All-School PA Meeting",date:"May 11, 2027",time:"6:00 p.m. - 8:00 p.m.",location:"Marian C. Krutulis PK-8 Campus",type:["Parent Association"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""},
 ];
 
 const ST_OPTS=["Not Started","Planning","Sponsorship","Registration Open","In Progress","At Risk","Completed","Cancelled"];
@@ -978,13 +978,14 @@ function docCell(arr, idx, field) {
   return td;
 }
 
-function linkCell(data, idx) {
+function linkCell(data, idx, key) {
+  key=key||"link";
   const td=document.createElement('td');
   td.style.minWidth='115px';
 
   const vspan=document.createElement('span');
   function updateView() {
-    const v=data[idx].link||'';
+    const v=data[idx][key]||'';
     if(v) vspan.innerHTML='<a href="'+v+'" target="_blank" style="color:#1d4ed8;text-decoration:underline;font-size:12px;" onclick="event.stopPropagation()">Open link</a>';
     else vspan.innerHTML='<span style="color:#d1d5db;font-size:11px;"></span>';
   }
@@ -994,8 +995,8 @@ function linkCell(data, idx) {
   inp.type='url';
   inp.className='c-link';
   inp.placeholder='https://...';
-  inp.value=data[idx].link||'';
-  inp.oninput=function(){ data[idx].link=this.value; updateView(); markSaved(); };
+  inp.value=data[idx][key]||'';
+  inp.oninput=function(){ data[idx][key]=this.value; updateView(); markSaved(); };
   inp.ondblclick=function(){ if(this.value) window.open(this.value,'_blank'); };
 
   function applyLinkUnlock() {
@@ -1031,6 +1032,7 @@ const M_COLS=[
   {label:"Event Type",key:"type",w:160},
   {label:"Status",key:"status",w:125},
   {label:"Reg. Req",key:"regReq",w:68},
+  {label:"Act. Req",key:"actReq",w:68},
   {label:"Catering",key:"catering",w:68},
   {label:"Invite Link",key:"link",w:140},
   {label:"RSVP Link",key:"notes",w:145},
@@ -1063,6 +1065,12 @@ function getMonthKey(dateStr) {
   }
   // Format 3: "Sept 2" no year
   m = dateStr.match(/^(\w+)\s+\d+$/);
+  if(m) {
+    const mn = MONTH_NUM[m[1].toLowerCase()];
+    if(mn) { const yr = mn >= 7 ? 2026 : 2027; return MONTH_LABEL[mn] + ' ' + yr; }
+  }
+  // Format 4: "May 3 - 7" date range
+  m = dateStr.match(/^(\w+)\s+\d+\s*[-–]/);
   if(m) {
     const mn = MONTH_NUM[m[1].toLowerCase()];
     if(mn) { const yr = mn >= 7 ? 2026 : 2027; return MONTH_LABEL[mn] + ' ' + yr; }
@@ -1270,9 +1278,10 @@ function mRow(row, idx) {
   tr.appendChild(multiTypeCell(EVENTS,idx));
   tr.appendChild(selCell(EVENTS,idx,'status',{options:ST_OPTS,w:'118px',onChange:()=>updateStats()},v=>ST_PILL[v]||'pill-gray'));
   tr.appendChild(selCell(EVENTS,idx,'regReq',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-red'));
+  tr.appendChild(selCell(EVENTS,idx,'actReq',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-red'));
   tr.appendChild(selCell(EVENTS,idx,'catering',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-red'));
   tr.appendChild(linkCell(EVENTS,idx));
-  tr.appendChild(taCell(EVENTS,idx,'notes',{w:'140px'}));
+  tr.appendChild(linkCell(EVENTS,idx,'notes'));
   tr.onmousedown=function(e){
     if(selRow) selRow.classList.remove('selected');
     selRow=tr;
@@ -1474,7 +1483,7 @@ function renderFBar() {
 
 function addMasterRow() {
   if(!unlocked) return;
-  EVENTS.push({name:"New Event",date:"TBD",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",catering:"No",link:"",notes:""});
+  EVENTS.push({name:"New Event",date:"TBD",time:"TBD",location:"TBD",type:["General"],status:"Not Started",regReq:"No",actReq:"No",catering:"No",link:"",notes:""});
   renderMaster();
   refreshCLSel();
 }
