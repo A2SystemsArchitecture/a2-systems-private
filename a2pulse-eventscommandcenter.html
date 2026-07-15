@@ -1216,8 +1216,8 @@ function mRow(row, idx) {
   tr.appendChild(taCell(EVENTS,idx,'location',{w:'150px'}));
   tr.appendChild(multiTypeCell(EVENTS,idx));
   tr.appendChild(selCell(EVENTS,idx,'status',{options:ST_OPTS,w:'118px',onChange:()=>updateStats()},v=>ST_PILL[v]||'pill-gray'));
-  tr.appendChild(selCell(EVENTS,idx,'regReq',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-gray'));
-  tr.appendChild(selCell(EVENTS,idx,'catering',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-gray'));
+  tr.appendChild(selCell(EVENTS,idx,'regReq',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-red'));
+  tr.appendChild(selCell(EVENTS,idx,'catering',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-red'));
   tr.appendChild(linkCell(EVENTS,idx));
   tr.appendChild(taCell(EVENTS,idx,'notes',{w:'140px'}));
   tr.onmousedown=function(e){
