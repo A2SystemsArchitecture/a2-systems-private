@@ -1517,7 +1517,8 @@ let _pendingDeleteIdx=null;
 let _pendingDeletePanel=null;
 
 function delRow(){
-  if(!unlocked||!selRow) return alert('Select a row first.');
+  if(!unlocked) return;
+  if(!selRow){ alert('Click a row first, then click Delete Row.'); return; }
   _pendingDeleteIdx=parseInt(selRow.dataset.idx);
   _pendingDeletePanel=document.querySelector('.panel.active').id;
   // Get event name for modal
