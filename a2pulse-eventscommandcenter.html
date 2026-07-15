@@ -941,10 +941,12 @@ function selCell(data, idx, key, opts, labelFn) {
   wrap.className='pill-wrap';
   const sel=document.createElement('select');
   sel.className='c-sel';
+  const _initVal = data[idx][key] !== undefined && data[idx][key] !== '' ? data[idx][key] : (opts.options[1]||opts.options[0]);
+  if(data[idx][key]===undefined||data[idx][key]==='') data[idx][key]=_initVal;
   opts.options.forEach(o=>{
     const op=document.createElement('option');
     op.value=o; op.textContent=o;
-    if(o===data[idx][key]) op.selected=true;
+    if(o===_initVal) op.selected=true;
     sel.appendChild(op);
   });
   // style the wrap with the pill color
@@ -953,7 +955,7 @@ function selCell(data, idx, key, opts, labelFn) {
     wrap.className='pill-wrap pill '+cls;
     sel.style.color='inherit';
   }
-  applyPill(data[idx][key]);
+  applyPill(_initVal);
   sel.onchange=function(){
     if(!unlocked) return;
     data[idx][key]=this.value;
