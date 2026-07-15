@@ -268,6 +268,10 @@ body:not(.unlocked) .pill-wrap select{appearance:none;-webkit-appearance:none;po
 .undo-btn{background:#CA8A04;border:none;color:#2D1B4E;padding:6px 16px;cursor:pointer;font-family:Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;transition:background .2s;}
 .undo-btn:hover{background:#e6a805;}
 .undo-dismiss-btn{background:transparent;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.6);padding:6px 12px;cursor:pointer;font-family:Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;}
+
+.tb-danger{color:#dc2626!important;border-color:#dc2626!important;}
+.tb-danger:hover{background:#dc2626!important;color:#fff!important;}
+tr.selected .open-logistics-btn{background:#e6a805;}
 </style>
 </head>
 <body>
@@ -338,7 +342,7 @@ body:not(.unlocked) .pill-wrap select{appearance:none;-webkit-appearance:none;po
   <div class="tg" id="editToolGroup">
     <span class="tl">EDIT</span>
     <button class="tb" onclick="insRowAbove()">↑ Row</button>
-    <button class="tb" onclick="delRow()">🗑 Row</button>
+    <button class="tb tb-danger" id="delRowBtn" onclick="delRow()">🗑 Row</button>
     <button class="tb" onclick="openLM()">🔗 Link</button>
   </div>
   <div class="tg">
@@ -716,7 +720,11 @@ function rebuildBody(bodyId, cols, data, rowFn) {
     const origIdx=data.indexOf(r);
     const tr=rowFn(r, origIdx);
     tr.dataset.idx=origIdx;
-    tr.onclick=function(){ if(selRow) selRow.classList.remove('selected'); selRow=tr; tr.classList.add('selected'); };
+    tr.onmousedown=function(e){
+    if(selRow) selRow.classList.remove('selected');
+    selRow=tr;
+    tr.classList.add('selected');
+  };
     tb.appendChild(tr);
   });
 
@@ -1059,7 +1067,11 @@ function mRow(row, idx) {
   tr.appendChild(taCell(EVENTS,idx,'catering',{w:'60px'}));
   tr.appendChild(linkCell(EVENTS,idx));
   tr.appendChild(taCell(EVENTS,idx,'notes',{w:'140px'}));
-  tr.onclick=function(){ if(selRow) selRow.classList.remove('selected'); selRow=tr; tr.classList.add('selected'); };
+  tr.onmousedown=function(e){
+    if(selRow) selRow.classList.remove('selected');
+    selRow=tr;
+    tr.classList.add('selected');
+  };
   // Open in Event Logistics button
   const openTd=document.createElement('td');
   openTd.style.cssText='width:60px;min-width:60px;text-align:center;padding:4px;';
@@ -1217,7 +1229,11 @@ function rebuildMasterBody() {
     rows.forEach(row=>{ try {
       const origIdx=EVENTS.indexOf(row);
       const tr=mRow(row, origIdx);
-      tr.onclick=function(){ if(selRow) selRow.classList.remove('selected'); selRow=tr; tr.classList.add('selected'); };
+      tr.onmousedown=function(e){
+    if(selRow) selRow.classList.remove('selected');
+    selRow=tr;
+    tr.classList.add('selected');
+  };
       tb.appendChild(tr);
     } catch(err){ console.error('Row render error:', err, row); }});
   });
@@ -1488,7 +1504,8 @@ function restoreColWidths(headId, tableId) {
 }
 
 function insRowAbove() {
-  if(!unlocked||!selRow) return alert('Select a row first.');
+  if(!unlocked) return;
+  if(!selRow) return alert('Click a row first to select it, then click Delete Row.');
   const idx=parseInt(selRow.dataset.idx);
   const pid=document.querySelector('.panel.active').id;
   if(pid==='panel-master'){EVENTS.splice(idx,0,{...EVENTS[idx],name:"New Event"});renderMaster();}
