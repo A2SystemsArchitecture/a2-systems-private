@@ -677,9 +677,10 @@ const EVENTS = [
 ];
 
 const ST_OPTS=["Not Started","Planning","Sponsorship","Registration Open","In Progress","At Risk","Completed","Cancelled"];
-const TY_OPTS=["Development","Parent Association","Alumni","Fundraiser","Parent","General"];
+const TY_OPTS=["Development","Parent Association","Alumni","Fundraiser","Parent","General","Engagement"];
+const YN_OPTS=["Yes","No"];
 const ST_PILL={"Completed":"pill-green","Planning":"pill-plum","Sponsorship":"pill-yellow","Registration Open":"pill-green","In Progress":"pill-yellow","At Risk":"pill-red","Not Started":"pill-gray","Cancelled":"pill-gray"};
-const TY_CLS={"Development":"type-dev","Parent Association":"type-pa","Alumni":"type-alumni","Fundraiser":"type-fund","Parent":"type-pa","General":"type-general"};
+const TY_CLS={"Development":"type-dev","Parent Association":"type-pa","Alumni":"type-alumni","Fundraiser":"type-fund","Parent":"type-pa","General":"type-general","Engagement":"type-dev"};
 
 const DEPS=["Date Confirmed","Location Contract Signed","Budget Approved","Calendar Invite Sent","RSVP Page / OneCause Live","Briefing Meeting Scheduled","Debrief Meeting Scheduled","Sponsor List Finalized","Sponsor Logos Received","Save the Date Sent","Catering Confirmed","Catering Guarantee Submitted","Volunteer Plan Complete","Volunteer Assignments Sent","Run of Show Drafted","Print Materials Ordered","Shirt / Swag Order Submitted","W-9 Received (Vendors)","Event Folder Created","Communications Notified","Post-Event Thank-You Sent","Revenue Reconciliation Complete"];
 const SYM=["❌","🟡","✅","🔴","N/A"];
@@ -993,7 +994,7 @@ const M_COLS=[
   {label:"Date",key:"date",w:95},
   {label:"Time",key:"time",w:110},
   {label:"Location",key:"location",w:155},
-  {label:"Type",key:"type",w:160},
+  {label:"Event Type",key:"type",w:160},
   {label:"Status",key:"status",w:125},
   {label:"Reg. Req",key:"regReq",w:68},
   {label:"Catering",key:"catering",w:68},
@@ -1215,8 +1216,8 @@ function mRow(row, idx) {
   tr.appendChild(taCell(EVENTS,idx,'location',{w:'150px'}));
   tr.appendChild(multiTypeCell(EVENTS,idx));
   tr.appendChild(selCell(EVENTS,idx,'status',{options:ST_OPTS,w:'118px',onChange:()=>updateStats()},v=>ST_PILL[v]||'pill-gray'));
-  tr.appendChild(taCell(EVENTS,idx,'regReq',{w:'60px'}));
-  tr.appendChild(taCell(EVENTS,idx,'catering',{w:'60px'}));
+  tr.appendChild(selCell(EVENTS,idx,'regReq',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-gray'));
+  tr.appendChild(selCell(EVENTS,idx,'catering',{options:YN_OPTS,w:'68px'},v=>v==='Yes'?'pill-green':'pill-gray'));
   tr.appendChild(linkCell(EVENTS,idx));
   tr.appendChild(taCell(EVENTS,idx,'notes',{w:'140px'}));
   tr.onmousedown=function(e){
