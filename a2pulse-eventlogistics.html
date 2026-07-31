@@ -428,23 +428,22 @@ function loadFromURLParams(){
     const val=params.get(param);
     if(val){const el=document.getElementById(fieldId);if(el)el.value=val;}
   });
-  // Use ISO date from Command Center (eventDateISO = "2026-07-30")
-  const isoDate=params.get('eventDateISO');
-  if(isoDate){
-    const dateEl=document.getElementById('eventDate');
-    if(dateEl){
-      dateEl.value=isoDate;
-      // Show formatted date display next to field
-      const d=new Date(isoDate+'T00:00:00');
-      const formatted=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-      let dispEl=document.getElementById('eventDateDisplay');
-      if(!dispEl){
-        dispEl=document.createElement('div');
-        dispEl.id='eventDateDisplay';
-        dispEl.style.cssText='font-size:12px;color:var(--plum);font-weight:700;margin-top:4px;';
-        dateEl.parentNode.appendChild(dispEl);
+  // Date: show formatted display string from Command Center (e.g. "Thursday, July 30")
+  const formattedDate=params.get('eventDateFormatted');
+  if(formattedDate){
+    const dateField=document.getElementById('eventDate');
+    if(dateField){
+      // Replace date input with a text display showing the formatted date
+      const wrapper=dateField.parentNode;
+      dateField.style.display='none';
+      let dateDisplay=document.getElementById('eventDateText');
+      if(!dateDisplay){
+        dateDisplay=document.createElement('div');
+        dateDisplay.id='eventDateText';
+        dateDisplay.style.cssText='width:100%;background:var(--cream);border:1px solid var(--border2);padding:9px 11px;color:var(--nearblack);font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:var(--plum);';
+        wrapper.appendChild(dateDisplay);
       }
-      dispEl.textContent=formatted;
+      dateDisplay.textContent=formattedDate;
     }
   }
   const typeVal=params.get('eventType');
