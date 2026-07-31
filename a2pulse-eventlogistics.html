@@ -421,7 +421,6 @@ function loadFromURLParams(){
   if(!params.has('eventName')) return;
   const fieldMap={
     eventName:'eventName',
-    eventDate:'eventDate',
     eventTime:'eventTime',
     eventLocation:'eventLocation',
     inviteLink:'rsvpLink',
@@ -431,6 +430,25 @@ function loadFromURLParams(){
     const val=params.get(param);
     if(val){const el=document.getElementById(fieldId);if(el)el.value=val;}
   });
+  // Use ISO date from Command Center (eventDateISO = "2026-07-30")
+  const isoDate=params.get('eventDateISO');
+  if(isoDate){
+    const dateEl=document.getElementById('eventDate');
+    if(dateEl){
+      dateEl.value=isoDate;
+      // Show formatted date display next to field
+      const d=new Date(isoDate+'T00:00:00');
+      const formatted=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+      let dispEl=document.getElementById('eventDateDisplay');
+      if(!dispEl){
+        dispEl=document.createElement('div');
+        dispEl.id='eventDateDisplay';
+        dispEl.style.cssText='font-size:12px;color:var(--plum);font-weight:700;margin-top:4px;';
+        dateEl.parentNode.appendChild(dispEl);
+      }
+      dispEl.textContent=formatted;
+    }
+  }
   const typeVal=params.get('eventType');
   if(typeVal){const sel=document.getElementById('eventType');if(sel)[...sel.options].forEach(o=>{if(o.value===typeVal||o.text===typeVal)sel.value=o.value;});}
   updateDisplay();checkDateAlert();
