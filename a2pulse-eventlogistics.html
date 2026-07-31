@@ -159,6 +159,14 @@ textarea:focus{border-color:var(--plum);background:var(--lavender);}
 .auth-user-bar button:hover{border-color:var(--gold);color:var(--gold);}
 #app-content{display:none;}
 #app-content.visible{display:block;}
+
+/* ── RICH TEXT FORMATTING TOOLBAR ── */
+.fmt-toolbar{display:none;gap:4px;margin-bottom:4px;align-items:center;}
+.fmt-toolbar.visible{display:flex;}
+.fmt-btn{background:transparent;border:1px solid var(--border2);color:var(--plum);width:26px;height:26px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;border-radius:2px;}
+.fmt-btn:hover{background:var(--plum);color:var(--white);border-color:var(--plum);}
+.fmt-btn.active{background:var(--plum);color:var(--white);}
+.fmt-textarea-wrap{position:relative;}
 </style>
 </head>
 <body>
@@ -461,6 +469,64 @@ function loadFromURLParams(){
   const banner=document.getElementById('alertBanner');
   if(banner){banner.className='alert-banner green';banner.textContent='Event loaded from Command Center: '+params.get('eventName');banner.style.display='block';setTimeout(()=>{banner.style.display='none';},4000);}
 }
+
+function initRichText(){
+  document.querySelectorAll('textarea').forEach(ta=>{
+    if(ta.dataset.richInit) return;
+    ta.dataset.richInit='1';
+    const wrap=document.createElement('div');
+    wrap.className='fmt-textarea-wrap';
+    const toolbar=document.createElement('div');
+    toolbar.className='fmt-toolbar';
+    toolbar.innerHTML=`
+      <button type="button" class="fmt-btn" data-cmd="bold" title="Bold"><b>B</b></button>
+      <button type="button" class="fmt-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+      <button type="button" class="fmt-btn" data-cmd="underline" title="Underline"><u>U</u></button>`;
+    // Replace textarea with contenteditable div
+    const editor=document.createElement('div');
+    editor.contentEditable='true';
+    editor.className=ta.className+' fmt-editor';
+    editor.style.cssText=ta.style.cssText||'';
+    editor.style.minHeight=(ta.style.minHeight||'40px');
+    editor.style.outline='none';
+    editor.style.wordBreak='break-word';
+    // Load existing value as HTML
+    editor.innerHTML=ta.value||'';
+    // Sync editor back to textarea on input
+    editor.addEventListener('input',function(){
+      ta.value=this.innerHTML;
+      if(ta.oninput) ta.oninput.call(ta);
+      // Auto expand
+      this.style.height='auto';
+    });
+    editor.addEventListener('focus',function(){
+      toolbar.classList.add('visible');
+    });
+    editor.addEventListener('blur',function(e){
+      // Delay hide so toolbar button clicks register
+      setTimeout(()=>{
+        if(!toolbar.contains(document.activeElement)){
+          toolbar.classList.remove('visible');
+        }
+      },150);
+    });
+    // Toolbar button handlers
+    toolbar.querySelectorAll('.fmt-btn').forEach(btn=>{
+      btn.addEventListener('mousedown',function(e){
+        e.preventDefault(); // Prevent editor blur
+        document.execCommand(this.dataset.cmd,false,null);
+        editor.focus();
+        ta.value=editor.innerHTML;
+        if(ta.oninput) ta.oninput.call(ta);
+      });
+    });
+    // Insert into DOM
+    ta.parentNode.insertBefore(wrap,ta);
+    wrap.appendChild(toolbar);
+    wrap.appendChild(editor);
+    ta.style.display='none';
+  });
+}
 /* init gated by Firebase auth */
 </script>
 </div><!-- /app-content -->
@@ -475,7 +541,7 @@ function loadFromURLParams(){
       document.getElementById('app-content').classList.add('visible');
       const bar=document.getElementById('auth-user-bar');if(bar)bar.style.display='flex';
       document.getElementById('auth-user-email').textContent=user.email;
-      buildTables();checkDateAlert();loadFromURLParams();
+      buildTables();checkDateAlert();loadFromURLParams();initRichText();
     } else {
       document.getElementById('auth-overlay').classList.remove('hidden');
       document.getElementById('app-content').classList.remove('visible');
