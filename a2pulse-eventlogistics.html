@@ -486,10 +486,8 @@ function initRichText(){
     const editor=document.createElement('div');
     editor.contentEditable='true';
     editor.className=ta.className+' fmt-editor';
-    editor.style.cssText=ta.style.cssText||'';
-    editor.style.minHeight=(ta.style.minHeight||'40px');
-    editor.style.outline='none';
-    editor.style.wordBreak='break-word';
+    // Apply full textarea visual styling so box remains visible
+    editor.style.cssText='width:100%;background:#FFFBEB;border:1px solid #d4c9ee;padding:9px 11px;color:#1C1917;font-family:Arial,sans-serif;font-size:13px;min-height:'+(ta.style.minHeight||'40px')+';outline:none;word-break:break-word;line-height:1.5;display:block;box-sizing:border-box;';
     // Load existing value as HTML
     editor.innerHTML=ta.value||'';
     // Sync editor back to textarea on input
@@ -501,9 +499,16 @@ function initRichText(){
     });
     editor.addEventListener('focus',function(){
       toolbar.classList.add('visible');
+      this.style.borderColor='#2D1B4E';
+      this.style.background='#FAF5FF';
+    });
+    editor.addEventListener('blur',function(){
+      this.style.borderColor='#d4c9ee';
+      this.style.background='#FFFBEB';
     });
     editor.addEventListener('blur',function(e){
-      // Delay hide so toolbar button clicks register
+      this.style.borderColor='#d4c9ee';
+      this.style.background='#FFFBEB';
       setTimeout(()=>{
         if(!toolbar.contains(document.activeElement)){
           toolbar.classList.remove('visible');
