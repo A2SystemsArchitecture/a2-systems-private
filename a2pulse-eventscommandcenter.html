@@ -7,13 +7,17 @@
 <style>
 :root {
   --plum:#2D1B4E; --plum-mid:#3d2560; --plum-light:#5a3a7e;
-  --gold:#CA8A04; --cream:#FFFBEB; --lavender:#FAF5FF;
+  --gold:#CA8A04; --cream:#FFFFFF; --lavender:#e8f4f8;
   --near-black:#1C1917; --white:#ffffff;
   --green:#15803D; --green-bg:#DCFCE7;
   --yellow:#92400E; --yellow-bg:#FEF3C7;
   --red:#991B1B; --red-bg:#FEE2E2;
   --gray:#374151; --gray-bg:#F3F4F6;
-  --border:#E5E7EB;
+  --border:#c8dce8;
+
+  --gulliver-navy:#003057;--gulliver-blue:#0071ce;
+  --gulliver-light-blue:#98caec;--gulliver-teal:#35afc8;
+  --gulliver-tan:#f6dfa4;--gulliver-gray:#707271;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Arial,sans-serif;background:#1a0f2e;color:var(--near-black);min-height:100vh;}
@@ -89,7 +93,7 @@ thead th{
   border-bottom:2px solid var(--gold);white-space:nowrap;
   position:sticky;top:0;z-index:10;cursor:pointer;user-select:none;
 }
-thead th:hover{background:#ede9fe;}
+thead th:hover{background:#daeef7;}
 .sort-icon{margin-left:3px;font-style:normal;opacity:0.4;font-size:9px;}
 th.sort-asc .sort-icon::after{content:'▲';opacity:1;}
 th.sort-desc .sort-icon::after{content:'▼';opacity:1;}
@@ -101,8 +105,8 @@ th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'⇅';}
 
 td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tbody tr:hover td{background:#f9f7ff;}
-tbody tr.selected td{background:#ede9fe!important;}
+tbody tr:hover td{background:#f0f8fc;}
+tbody tr.selected td{background:#daeef7!important;}
 
 /* FROZEN FIRST COL — all tables */
 tbody td:first-child, thead th:first-child {
@@ -110,13 +114,13 @@ tbody td:first-child, thead th:first-child {
   background:#ffffff;
 }
 thead th:first-child{z-index:12;background:var(--lavender);}
-tbody tr:hover td:first-child{background:#f9f7ff;}
-tbody tr.selected td:first-child{background:#ede9fe!important;}
+tbody tr:hover td:first-child{background:#f0f8fc;}
+tbody tr.selected td:first-child{background:#daeef7!important;}
 /* month header spans full width — no sticky needed */
 .month-hdr td{position:static!important;background:var(--plum)!important;}
 
 /* FROZEN FIRST COL — readiness */
-.rtbl th:first-child,.rtbl td:first-child{position:sticky;left:0;z-index:5;background:#f9f7ff;border-right:2px solid var(--border);min-width:195px;font-weight:700;color:var(--plum);}
+.rtbl th:first-child,.rtbl td:first-child{position:sticky;left:0;z-index:5;background:#f0f8fc;border-right:2px solid var(--border);min-width:195px;font-weight:700;color:var(--plum);}
 .rtbl thead th:first-child{z-index:15;background:var(--lavender);}
 .rtbl td:not(:first-child){text-align:center;min-width:105px;cursor:pointer;}
 .rtbl th:not(:first-child){text-align:center;min-width:105px;}
@@ -171,7 +175,7 @@ body:not(.unlocked) .pill-wrap select{appearance:none;-webkit-appearance:none;po
 
 /* ADD ROW */
 .add-row-btn{width:100%;padding:7px;background:var(--lavender);border:1px dashed var(--plum-light);border-top:none;color:var(--plum);font-size:11px;font-weight:700;cursor:pointer;text-align:center;}
-.add-row-btn:hover{background:#ede9fe;}
+.add-row-btn:hover{background:#daeef7;}
 
 /* STATS */
 .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
@@ -258,10 +262,10 @@ body:not(.unlocked) .pill-wrap select{appearance:none;-webkit-appearance:none;po
 .del-modal-actions{display:flex;gap:10px;justify-content:flex-end;}
 .del-confirm-btn{background:#dc2626;border:none;color:#fff;padding:10px 22px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
 .del-confirm-btn:hover{background:#b91c1c;}
-.del-cancel-btn{background:transparent;border:1px solid #d4c9ee;color:#6b6560;padding:10px 22px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
+.del-cancel-btn{background:transparent;border:1px solid #b0cedd;color:#6b6560;padding:10px 22px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
 .del-cancel-btn:hover{border-color:#2D1B4E;color:#2D1B4E;}
 /* ── UNDO IMPORT BANNER ── */
-#undoImportBanner{display:none;background:#1a0a2e;border-bottom:2px solid #CA8A04;padding:8px 24px;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0;}
+#undoImportBanner{display:none;background:#003057;border-bottom:2px solid #CA8A04;padding:8px 24px;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0;}
 #undoImportBanner.visible{display:flex;}
 #undoImportBanner span{color:#fff;font-size:12px;font-family:Arial,sans-serif;}
 #undoImportBanner strong{color:#CA8A04;}
@@ -281,14 +285,14 @@ tr.selected .open-logistics-btn{background:#e6a805;}
 .restore-box{background:#fff;border-top:4px solid #CA8A04;padding:32px;max-width:520px;width:92%;max-height:80vh;overflow-y:auto;}
 .restore-box h3{color:#2D1B4E;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:Arial,sans-serif;}
 .restore-box p{font-size:12px;color:#6b6560;margin-bottom:20px;font-family:Arial,sans-serif;line-height:1.5;}
-.revision-item{border:1px solid #e2d9f3;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.revision-item:hover{background:#FAF5FF;}
+.revision-item{border:1px solid #c8dce8;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.revision-item:hover{background:#e8f4f8;}
 .revision-meta{flex:1;}
 .revision-meta .rev-time{font-size:13px;font-weight:700;color:#2D1B4E;font-family:Arial,sans-serif;}
 .revision-meta .rev-count{font-size:11px;color:#6b6560;margin-top:3px;font-family:Arial,sans-serif;}
 .rev-restore-btn{background:#2D1B4E;border:none;color:#fff;padding:8px 16px;cursor:pointer;font-family:Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;transition:background .2s;}
 .rev-restore-btn:hover{background:#CA8A04;color:#2D1B4E;}
-.restore-close-btn{background:transparent;border:1px solid #d4c9ee;color:#6b6560;padding:8px 18px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;margin-top:16px;}
+.restore-close-btn{background:transparent;border:1px solid #b0cedd;color:#6b6560;padding:8px 18px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;margin-top:16px;}
 .restore-close-btn:hover{border-color:#2D1B4E;color:#2D1B4E;}
 .no-revisions{font-size:13px;color:#6b6560;font-family:Arial,sans-serif;text-align:center;padding:20px 0;}
 
@@ -298,18 +302,18 @@ tr.selected .open-logistics-btn{background:#e6a805;}
 .import-confirm-box{background:#fff;border-top:4px solid #CA8A04;padding:32px;max-width:520px;width:92%;max-height:80vh;overflow-y:auto;}
 .import-confirm-box h3{color:#2D1B4E;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:Arial,sans-serif;}
 .import-confirm-box .ic-sub{font-size:12px;color:#6b6560;margin-bottom:20px;line-height:1.5;font-family:Arial,sans-serif;}
-.import-preview-item{border:1px solid #e2d9f3;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.import-preview-item{border:1px solid #c8dce8;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .import-preview-item.skip{background:#fafafa;opacity:.6;}
 .import-preview-item .ip-left{flex:1;}
 .import-preview-item .ip-tab{font-size:13px;font-weight:700;color:#2D1B4E;font-family:Arial,sans-serif;}
 .import-preview-item .ip-detail{font-size:11px;color:#6b6560;margin-top:3px;font-family:Arial,sans-serif;}
 .import-preview-item .ip-badge{font-size:10px;font-weight:700;padding:3px 10px;text-transform:uppercase;letter-spacing:.5px;font-family:Arial,sans-serif;white-space:nowrap;}
-.ip-badge.will-import{background:#dcfce7;color:#166534;}
+.ip-badge.will-import{background:#e8f4f8;color:#003057;}
 .ip-badge.will-skip{background:#f3f4f6;color:#6b7280;}
 .import-confirm-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
 .ic-confirm-btn{background:#CA8A04;border:none;color:#2D1B4E;padding:10px 24px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;transition:background .2s;}
 .ic-confirm-btn:hover{background:#e6a805;}
-.ic-cancel-btn{background:transparent;border:1px solid #d4c9ee;color:#6b6560;padding:10px 24px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
+.ic-cancel-btn{background:transparent;border:1px solid #b0cedd;color:#6b6560;padding:10px 24px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
 .ic-cancel-btn:hover{border-color:#2D1B4E;color:#2D1B4E;}
 .import-warning{background:#fef9c3;border:1px solid #fde047;padding:10px 14px;font-size:12px;color:#854d0e;margin-bottom:16px;font-family:Arial,sans-serif;line-height:1.5;}
 </style>
@@ -331,17 +335,17 @@ tr.selected .open-logistics-btn{background:#e6a805;}
     <div id="cc-auth-error" style="display:none;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;padding:10px 12px;font-size:12px;margin-bottom:16px;font-family:Arial,sans-serif;"></div>
     <div style="margin-bottom:14px;">
       <label style="display:block;font-size:10px;color:#2D1B4E;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;font-family:Arial,sans-serif;">Email Address</label>
-      <input type="email" id="cc-auth-email" placeholder="Enter your email" style="width:100%;background:#FFFBEB;border:1px solid #d4c9ee;padding:10px 12px;color:#1C1917;font-family:Arial,sans-serif;font-size:13px;outline:none;"/>
+      <input type="email" id="cc-auth-email" placeholder="Enter your email" style="width:100%;background:#FFFFFF;border:1px solid #b0cedd;padding:10px 12px;color:#1C1917;font-family:Arial,sans-serif;font-size:13px;outline:none;"/>
     </div>
     <div style="margin-bottom:20px;">
       <label style="display:block;font-size:10px;color:#2D1B4E;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;font-family:Arial,sans-serif;">Password</label>
-      <input type="password" id="cc-auth-password" placeholder="Enter your password" style="width:100%;background:#FFFBEB;border:1px solid #d4c9ee;padding:10px 12px;color:#1C1917;font-family:Arial,sans-serif;font-size:13px;outline:none;"/>
+      <input type="password" id="cc-auth-password" placeholder="Enter your password" style="width:100%;background:#FFFFFF;border:1px solid #b0cedd;padding:10px 12px;color:#1C1917;font-family:Arial,sans-serif;font-size:13px;outline:none;"/>
     </div>
     <button id="cc-auth-btn" style="width:100%;background:#CA8A04;border:none;color:#2D1B4E;padding:13px;cursor:pointer;font-family:Arial,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Sign In</button>
     <div style="margin-top:14px;text-align:center;font-size:11px;color:#6b6560;font-family:Arial,sans-serif;">A2 Systems Architecture&#169; &bull; Confidential</div>
   </div>
 </div>
-<div id="cc-user-bar" style="display:none;background:#1a0a2e;border-bottom:1px solid rgba(202,138,4,.3);padding:6px 32px;align-items:center;justify-content:space-between;">
+<div id="cc-user-bar" style="display:none;background:#003057;border-bottom:1px solid rgba(202,138,4,.3);padding:6px 32px;align-items:center;justify-content:space-between;">
   <span id="cc-user-email" style="color:rgba(255,255,255,.6);font-size:10px;letter-spacing:.8px;font-family:Arial,sans-serif;"></span>
   <button id="cc-signout-btn" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:4px 12px;cursor:pointer;font-family:Arial,sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;">Sign Out</button>
 </div>
@@ -1264,7 +1268,7 @@ function datDisplayCell(data, idx){
   display.textContent=currentISO?parseISOToDisplay(currentISO):(data[idx]['date']||'TBD');
   const inp=document.createElement('input');
   inp.type='date';
-  inp.style.cssText='display:none;width:100%;font-family:Arial,sans-serif;font-size:12px;border:1px solid #d4c9ee;padding:4px;background:#FFFBEB;';
+  inp.style.cssText='display:none;width:100%;font-family:Arial,sans-serif;font-size:12px;border:1px solid #b0cedd;padding:4px;background:#FFFFFF;';
   if(currentISO) inp.value=currentISO;
   inp.onchange=function(){
     const iso=this.value;
